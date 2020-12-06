@@ -1,10 +1,11 @@
 package aoc2020;
 
 import util.FUtils;
+import util.Util;
 
 public class Day01 {
     public static void main(String[] args) {
-        new Day01().go();
+        Util.profile(() -> new Day01().go(), 1);
     }
 
     void go() {
@@ -14,6 +15,7 @@ public class Day01 {
                 for (int c : in) {
                     if (a + b + c == 2020) {
                         System.out.println(a*b*c);
+                        return;
                     }
                 }
             }

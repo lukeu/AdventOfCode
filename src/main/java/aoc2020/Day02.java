@@ -3,10 +3,11 @@ package aoc2020;
 import java.util.Scanner;
 
 import util.FUtils;
+import util.Util;
 
 public class Day02 {
     public static void main(String[] args) {
-        new Day02().go();
+        Util.profile(() -> new Day02().go(), 1);
     }
 
     // Example:
@@ -31,12 +32,10 @@ public class Day02 {
             if (Boolean.FALSE) {
                 int count = (int) str.chars().filter(c -> c == ch).count();
                 if (count >= min && count <= max) {
-                    System.out.println(str);
                     found ++;
                 }
             } else {
                 if (str.charAt(min-1) == ch ^ str.charAt(max-1) == ch) {
-                    System.out.println(str);
                     found ++;
                 }
             }

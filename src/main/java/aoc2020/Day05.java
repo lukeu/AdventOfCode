@@ -1,10 +1,11 @@
 package aoc2020;
 
 import util.FUtils;
+import util.Util;
 
 public class Day05 {
     public static void main(String[] args) {
-        new Day05().faster();
+        Util.profile(() -> new Day05().faster(), 1);
     }
 
     // New and improved, learning for next time...

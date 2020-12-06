@@ -9,10 +9,11 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.google.common.primitives.Ints;
 import util.FUtils;
+import util.Util;
 
 public class Day04 {
     public static void main(String[] args) {
-        new Day04().go();
+        Util.profile(() -> new Day04().go(), 1);
     }
 
     Set<String> keys = Set.of(
@@ -49,7 +50,6 @@ public class Day04 {
     // Not aiming for clean code, but things I should have thought of for speed
     private boolean revised(Map<String, String> m) {
         SetView<String> inter = Sets.intersection(keys, m.keySet());
-        System.out.println("" + inter.size() + m);
         if (inter.size() < 7) {
             return false;
         }

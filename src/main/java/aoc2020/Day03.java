@@ -1,10 +1,11 @@
 package aoc2020;
 
 import util.FUtils;
+import util.Util;
 
 public class Day03 {
     public static void main(String[] args) {
-        new Day03().go();
+        Util.profile(() -> new Day03().go(), 1);
     }
 
     void go() {
@@ -36,7 +37,6 @@ public class Day03 {
             x += 1;
         }
         System.out.println(found);
-        total *= found;
-        System.out.println(total);
+        System.out.println(total * found);
     }
 }
