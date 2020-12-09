@@ -33,6 +33,11 @@ public class FUtils {
         return br.lines().mapToInt(Integer::parseInt).toArray();
     }
 
+    public static long[] readLineLongs(int year, int day) {
+        var br = newReader(newStream(year, day));
+        return br.lines().mapToLong(Long::parseLong).toArray();
+    }
+
     public static int[] readCommaInts(int year, int day) {
         var br = newReader(newStream(year, day));
         return br.lines()
