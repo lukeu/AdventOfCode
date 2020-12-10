@@ -61,21 +61,28 @@ public class Day09_EncodingError extends Base {
             .anyMatch(set -> Util.sumBoxed(set) == in[index]);
     }
 
+    // Optimisation: shift the input array each time & accumulate into another
+    // O(N^3) => O(N^2) and now takes around 0.02 ms on my input
     @Override
     public Object part2() {
-        long invalid = part1();
-        for (int s = 2; s < in.length; s++) {
-            for (int i = 0; i < in.length - s; i++) {
-
-                long sum = Arrays.stream(in, i, i+s).sum();
-                if (sum == invalid) {
-                    long min = Util.min(in, i, i+s);
-                    long max = Util.max(in, i, i+s);
-
-                    return min + max;
+        long expected = part1();
+        long[] acc = Arrays.copyOf(in, in.length);
+        for (int s = 1; s < in.length; s++) {
+            for (int i = s; i < in.length; i++) {
+                acc[i-s] += in[i];
+            }
+            for (int i = 0; i < in.length - s - 1; i++) {
+                if (acc[i] == expected) {
+                    return report(s, i);
                 }
             }
         }
         return -1L;
+    }
+
+    private long report(int s, int i) {
+        long min = Util.min(in, i, i+s+1);
+        long max = Util.max(in, i, i+s+1);
+        return min + max;
     }
 }
