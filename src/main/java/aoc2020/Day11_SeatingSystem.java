@@ -90,7 +90,7 @@ public class Day11_SeatingSystem extends Base {
 
     private char at(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= len) {
-            return '.';
+            return '+';
         }
         return prev[y*width + x];
     }
