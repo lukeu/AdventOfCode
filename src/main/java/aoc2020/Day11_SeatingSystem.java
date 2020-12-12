@@ -86,22 +86,20 @@ public class Day11_SeatingSystem extends Base {
 
     int iterate() {
         int count = 0;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < len; y++) {
-                char seat = rules(x,y);
-                grid[y*width + x] = seat;
-                if (seat == '#') {
-                    count++;
-                }
+        for (int i = 0; i < grid.length; i++) {
+            char seat = rules(i);
+            grid[i] = seat;
+            if (seat == '#') {
+                count++;
             }
         }
         return count;
     }
 
-    char rules(int x, int y) {
-        char c = prev[y*width + x];
+    char rules(int i) {
+        char c = prev[i];
         int occupied = 0;
-        for (int seat : visible[y*width + x]) {
+        for (int seat : visible[i]) {
             char ch = prev[seat];
             if (ch == '#') {
                 if (c == 'L') {
