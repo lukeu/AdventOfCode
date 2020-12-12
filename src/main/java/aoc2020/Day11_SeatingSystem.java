@@ -45,10 +45,16 @@ public class Day11_SeatingSystem extends Base {
         }
 
         do {
-            prev = Arrays.copyOf(grid, grid.length);
+            swapGrids();
             found = iterate();
         } while (!Arrays.equals(prev, grid));
         return found;
+    }
+
+    void swapGrids() {
+        char[] temp = prev;
+        prev = grid;
+        grid = temp;
     }
 
     private static final int[] nyarp = new int[0];
