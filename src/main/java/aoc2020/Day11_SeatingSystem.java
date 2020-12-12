@@ -72,6 +72,9 @@ public class Day11_SeatingSystem extends Base {
                     for (int m = 1; m < width; m++) {
                         char ch = at(x+dx*m, y+dy*m);
                         if (ch == '#') {
+                            if (c == 'L') {
+                                return 'L';
+                            }
                             occupied ++;
                         }
                         if (ch != '.') {
