@@ -19,9 +19,9 @@ public class Bot {
         int dy;
     }
 
-    int x = 0;
-    int y = 0;
-    Dir dir = Dir.E;
+    public int x = 0;
+    public int y = 0;
+    public Dir dir = Dir.E;
 
     public void left() {
         dir = switch(dir) {
@@ -39,6 +39,12 @@ public class Bot {
             case S -> Dir.W;
         };
     }
+    public void forward(int n) {
+        move(n);
+    }
+    public void back(int n) {
+        move(-n);
+    }
     public void forward() {
         move(1);
     }
@@ -48,5 +54,15 @@ public class Bot {
     public void move(int steps) {
         x += (dir.dx * steps);
         y += (dir.dy * steps);
+    }
+    public void leftOrigin() {
+        int temp = x;
+        x = y;
+        y = -temp;
+    }
+    public void rightOrigin() {
+        int temp = y;
+        y = x;
+        x = -temp;
     }
 }
