@@ -61,8 +61,11 @@ public class Day11_SeatingSystem extends Base {
     }
 
     private char rules(int x, int y) {
+        char c = at(x,y);
+        if (c == '.') {
+            return '.';
+        }
         int occupied = 0;
-
         for (int dx = -1; dx < 2; dx++) {
             for (int dy = -1; dy < 2; dy++) {
                 if (dx != 0 || dy != 0) {
@@ -78,14 +81,13 @@ public class Day11_SeatingSystem extends Base {
                 }
             }
         }
-        char ch = at(x, y);
-        if (ch == 'L' && occupied == 0) {
+        if (c == 'L' && occupied == 0) {
             return '#';
         }
-        if (ch == '#' && occupied >= 5) {
+        if (c == '#' && occupied >= 5) {
             return 'L';
         }
-        return ch;
+        return c;
     }
 
     private char at(int x, int y) {
