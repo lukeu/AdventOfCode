@@ -45,16 +45,10 @@ public class Day11_SeatingSystem extends Base {
         }
 
         do {
-            swapGrids();
+            prev = Arrays.copyOf(grid, grid.length);
             found = iterate();
         } while (!Arrays.equals(prev, grid));
         return found;
-    }
-
-    void swapGrids() {
-        char[] temp = prev;
-        prev = grid;
-        grid = temp;
     }
 
     private static final int[] nyarp = new int[0];
@@ -86,35 +80,39 @@ public class Day11_SeatingSystem extends Base {
 
     int iterate() {
         int count = 0;
-        for (int i = 0; i < grid.length; i++) {
-            char seat = rules(i);
-            grid[i] = seat;
-            if (seat == '#') {
-                count++;
+        for (int i = 0; i < prev.length; i++) {
+            switch (prev[i]) {
+                case '#' -> { checkLeave(i); count++; }
+                case 'L' -> checkTake(i);
             }
         }
         return count;
     }
 
-    char rules(int i) {
-        char c = prev[i];
+    /** prev[i] is 'L'. See if grid[i] should be set to '#' */
+    void checkTake(int i) {
+        for (int seat : visible[i]) {
+            if (prev[seat] == '#') {
+                return;
+            }
+        }
+        grid[i] = '#';
+    }
+
+    /** prev[i] is '#'. See if grid[i] should be set to 'L' */
+    void checkLeave(int i) {
+
+        // NB: this could be a 1-liner using Streams, but this compiles to faster code
         int occupied = 0;
         for (int seat : visible[i]) {
             char ch = prev[seat];
             if (ch == '#') {
-                if (c == 'L') {
-                    return 'L';
-                }
                 occupied ++;
             }
         }
-        if (c == 'L' && occupied == 0) {
-            return '#';
+        if (occupied >= 5) {
+            grid[i] = 'L';
         }
-        if (c == '#' && occupied >= 5) {
-            return 'L';
-        }
-        return c;
     }
 
     private char at(int x, int y) {
