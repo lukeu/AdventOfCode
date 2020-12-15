@@ -16,21 +16,17 @@ public class Day15_RambunctiousRecitation {
         var in = new int[] {8,0,17,4,1,12};
 
         int turn = 1;
-        int spoken = 0;
         for (int i : in) {
-            spoken = i;
-            history.put(spoken, turn);
-            turn++;
+            history.put(i, turn++);
         }
-        history.remove(spoken);
+        int speek = in[in.length - 1];
+        history.remove(speek);
 
-        int speek = spoken;
-        while (turn <= END) {
-            spoken = speek;
+        for ( ; turn <= END; turn++) {
+            int spoken = speek;
             Integer prev = history.get(spoken);
             speek = (prev == null) ? 0 : (turn - prev - 1);
             history.put(spoken, turn - 1);
-            turn++;
         }
 
         System.out.println("Found: " + speek);
