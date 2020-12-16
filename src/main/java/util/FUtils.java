@@ -41,12 +41,26 @@ public class FUtils {
                 .toArray();
     }
 
+    public static String readIfExists(String resourcePath) {
+        InputStream is = FUtils.class.getClassLoader().getResourceAsStream(resourcePath);
+        if (is == null) {
+            System.err.println("Not found: " + resourcePath);
+            return "";
+        }
+        System.out.println("Reading: " + resourcePath);
+        return newReader(is).lines().collect(Collectors.joining("\n"));
+    }
+
     private static BufferedReader newReader(InputStream is) {
         return new BufferedReader(new InputStreamReader(is));
     }
 
     private static InputStream newStream(int year, int day) {
         return FUtils.class.getClassLoader().getResourceAsStream(
-                String.format("%d/in_%02d.txt", year, day));
+                resourceName(year, day));
+    }
+
+    public static String resourceName(int year, int day) {
+        return String.format("%d/in_%02d.txt", year, day);
     }
 }

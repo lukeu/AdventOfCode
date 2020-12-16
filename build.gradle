@@ -1,6 +1,7 @@
 
 plugins {
     id 'java'
+    id 'application'
 }
 
 sourceCompatibility = 15
@@ -9,6 +10,15 @@ targetCompatibility = 15
 tasks.withType(JavaCompile).each {
     it.options.compilerArgs.add('--enable-preview')
 }
+
+applicationName = 'AoC'
+mainClassName = 'framework.AoC'
+version = '0.2020'
+
+applicationDefaultJvmArgs = [
+    "-Xmx6G", "-Xms6G", "-XX:+UseParallelGC",
+    "--enable-preview"
+]
 
 repositories {
     mavenLocal()

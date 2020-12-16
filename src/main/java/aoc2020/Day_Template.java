@@ -1,20 +1,45 @@
 package aoc2020;
 
+import framework.Base;
 import util.FUtils;
+import util.SUtils;
 
-public class Day_Template {
+public class Day_Template extends Base {
     public static void main(String[] args) {
-        new Day_Template().go();
+        Base.run(Day_Template::new, 1);
     }
 
-    void go() {
+    @Override
+    public String testInput() {
+        return FUtils.readIfExists("" + year() + "/Test_" + day() + ".txt");
+    }
+    @Override public Object testExpect1() { return 0L; }
+    @Override public Object testExpect2() { return 0L; }
+
+    @Override
+    public void parse(String in) {
+        for (String line : SUtils.lines(in)) {
+
+            
+
+        }
+    }
+
+    @Override
+    public Long part1() {
         long found = 0;
-        var in = FUtils.readLines(2020, 99999);
 
         
 
-        System.out.println("Input lines: " + in.size());
+        return found;
+    }
 
-        System.out.println("Found: " + found);
+    @Override
+    public Long part2() {
+        long found = 0;
+
+        
+
+        return found;
     }
 }
