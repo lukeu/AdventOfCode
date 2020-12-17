@@ -1,0 +1,11 @@
+
+Day 14:
+ - Rapid: derive 'floating-bit' combinations using a recursive function &
+   simple string building 
+
+Day 17 part 2 - different angles:
+ - Slow (260 ms) What sort of speed-up could be expected from symmetry?
+ - Future utils:
+     - handling >= 4D data
+     - Combinatoric iterators (like python itertools)
+
