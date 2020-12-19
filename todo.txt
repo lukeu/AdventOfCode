@@ -9,3 +9,9 @@ Day 17 part 2 - different angles:
      - handling >= 4D data
      - Combinatoric iterators (like python itertools)
 
+Day 19 (parsing) - oh, so many ideas...
+ - Learn: browse other interesting solutions
+ - Perf: stop with all the array copying
+ - Shortest: convert rule-text to an ANTLR grammar, generate a parser (or just tokenizer?)
+ - Competitive: develop a reusable rule engine
+ - Language: try one that makes the head|tail stuff more natural
