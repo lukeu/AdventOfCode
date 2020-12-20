@@ -12,11 +12,11 @@ public class Day03 {
 
         long total = 1;
         var in = FUtils.readLines(2020, 3);
+        int w = in.get(0).length();
         for (int i : new int []{1,3,5,7}) {
             int x = 0;
             int found = 0;
             for (String s : in) {
-                int w = s.length();
                 if (s.charAt(x % w) == '#') {
                     found++;
                 }
@@ -30,7 +30,6 @@ public class Day03 {
         int found = 0;
         for (int i = 0; i < in.size(); i += 2) {
             String s = in.get(i);
-            int w = s.length();
             if (s.charAt(x % w) == '#') {
                 found++;
             }

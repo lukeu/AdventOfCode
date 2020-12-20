@@ -28,13 +28,11 @@ public class Day04 {
     );
 
     void go() {
-
         long found = 0;
         var in = FUtils.splitLines(2020, 4, "\n\n");
         for (String s : in) {
-            Map<String,String> m = new HashMap<>();
-            String[] fields = s.split("\\s+");
-            for (String field : fields) {
+            var m = new HashMap<String, String>();
+            for (String field : s.split("\\s+")) {
                 var f = field.split(":");
                 m.put(f[0], f[1]);
             }
@@ -68,50 +66,6 @@ public class Day04 {
                 default -> true;
             };
             if (!ok) return false;
-        }
-        return true;
-    }
-
-    @SuppressWarnings("unused")
-    // As written under pressure...
-    private boolean original(Map<String, String> m) {
-        System.out.println("" + m.size() + m);
-        SetView<String> inter = Sets.intersection(keys, m.keySet());
-        System.out.println("" + inter.size() + inter);
-        if (inter.size() < 7) {
-            return false;
-        }
-        int byr = Ints.tryParse(m.get("byr"));
-        int iyr = Ints.tryParse(m.get("iyr"));
-        int eyr = Ints.tryParse(m.get("eyr"));
-        if (byr < 1920 || byr > 2002
-                || iyr < 2010 || iyr > 2020
-                || eyr < 2020 || eyr > 2030) {
-            return false;
-        }
-        String hh = m.get("hgt");
-        if (!checkHeight(hh)) {
-            return false;
-        }
-        String hc = m.get("hcl");
-        if (!hc.startsWith("#")) {
-            return false;
-        }
-        for (int i = 1; i < hc.length(); i++) {
-            char ch = hc.charAt(i);
-            boolean ok =  (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f');
-            if (!ok) return false;
-        }
-        if (!colours.contains(m.get("ecl"))) {
-            return false;
-        }
-        String pid = m.get("pid");
-        if (pid.length() != 9) return false;
-        for (int i = 0; i < pid.length(); i++) {
-            char ch = pid.charAt(i);
-            if (!(ch >= '0' && ch <= '9')) {
-                return false;
-            }
         }
         return true;
     }
