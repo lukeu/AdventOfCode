@@ -1,17 +1,25 @@
 
+Day 5:
+ + SUtil: multi-replace. (Handle swapping)
+
 Day 14:
  - Rapid: derive 'floating-bit' combinations using a recursive function &
    simple string building 
 
-Day 17 part 2 - different angles:
- - Slow (260 ms) What sort of speed-up could be expected from symmetry?
+Day 17 part 2 (4D conway hyper-cubes):
+ - Slow (260 ms) What sort of speed-up could be expected from symmetry? Only 4x?
  - Future utils:
      - handling >= 4D data
      - Combinatoric iterators (like python itertools)
 
 Day 19 (parsing) - oh, so many ideas...
  - Learn: browse other interesting solutions
- - Perf: stop with all the array copying
+ - Perf:
+    -- stop with all the array copying
+    -- pre-process the rules?
  - Shortest: convert rule-text to an ANTLR grammar, generate a parser (or just tokenizer?)
- - Competitive: develop a reusable rule engine
+ - Rapid: develop a reusable rule engine
  - Language: try one that makes the head|tail stuff more natural
+
+ Day 21:
+ - Another scenario for a rules engine (different logic, but can reuse process-of-elimination)

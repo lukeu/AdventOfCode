@@ -3,14 +3,13 @@ package aoc2020;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import framework.AocMeta;
 import framework.Base;
@@ -50,15 +49,18 @@ public class Day21_AllergenAssessment extends Base {
         }).collect(toList());
     }
 
-    /** ALLERGEN => ingredients */
+    /** ALLERGEN => possible ingredients */
     Map<String, Set<String>> poss = new TreeMap<>();
 
     @Override
     public Long part1() {
-        Set<String> allIngr = foods.stream().flatMap(f -> f.ingr.stream()).collect(toSet());
-        Set<String> allAll = foods.stream().flatMap(f -> f.allergens.stream()).collect(toSet());
-        for (String string : allAll) {
-            poss.put(string, new TreeSet<>(allIngr));
+
+        // Start with all ingredients as possibilities
+        Set<String> ingr = foods.stream().flatMap(f -> f.ingr.stream()).collect(toSet());
+        for (Food f : foods) {
+            for (String a : f.allergens) {
+                poss.put(a, new HashSet<>(ingr));
+            }
         }
 
         for (Food food : foods) {
@@ -67,44 +69,33 @@ public class Day21_AllergenAssessment extends Base {
             }
         }
 
-        // Eliminate
-        boolean change = false;
+        // Eliminate any known allergens from all other possibilities
+        boolean change;
         do {
             change = false;
-            for (Set<String> allergens : poss.values()) {
-                if (allergens.size() == 1) {
-                    var all = allergens.iterator().next();
-                    for (var e : poss.entrySet()) {
-                        if (e.getValue().size() > 1 && e.getValue().contains(all)) {
-                            change = true;
-                            e.getValue().removeAll(allergens);
+            for (Set<String> values : poss.values()) {
+                if (values.size() == 1) {
+                    for (var other : poss.values()) {
+                        if (other != values) {
+                            change |= other.removeAll(values); // Only removing a single item
                         }
                     }
                 }
             }
         } while (change);
 
-        var none = new TreeSet<>(allIngr);
-        for (Set<String> set : poss.values()) {
-            none.removeAll(set);
-        }
-        long found = 0;
-        for (Food food : foods) {
-            for (String i : food.ingr) {
-                if (none.contains(i)) {
-                    found++;
-                }
-            }
-        }
-        return found;
+        // Remove ingredients with allergens, leaving just the 'inert' ingredients in "ingr"
+        poss.values().forEach(ingr::removeAll);
+        return foods.stream()
+                .flatMap(f -> f.ingr.stream())
+                .filter(ingr::contains)
+                .count();
     }
 
     @Override
     public String part2() {
-        var p2 = new ArrayList<>();
-        for (Set<String> s : poss.values()) {
-            p2.add(s.iterator().next());
-        }
-        return Joiner.on(",").join(p2);
+        return poss.values().stream()
+                .map(s -> s.iterator().next())
+                .collect(Collectors.joining(","));
     }
 }
