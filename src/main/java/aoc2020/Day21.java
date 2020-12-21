@@ -1,9 +1,11 @@
 package aoc2020;
 
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -31,30 +33,26 @@ public class Day21 extends Base {
 
     @Override
     public void parse(String in) {
-        Set<String> allIngr = new TreeSet<>();
-        Set<String> allAll = new TreeSet<>();
-        for (String line : SUtils.lines(in)) {
+        record Food(List<String> ingr, List<String> allergens) {}
 
+        var foods = SUtils.lines(in).stream().map(line -> {
             int split = line.indexOf(" (");
-            List<String> ingr = Splitter.on(' ').splitToList(line.substring(0, split));
-            var allergens = Splitter.on(", ")
-                    .splitToList(line.substring(split+", (contains".length(), line.length() - 1));
-            allIngr.addAll(ingr);
-            allAll.addAll(allergens);
-        }
+            String allergenText = line.substring(split + ", (contains".length(), line.length() - 1);
+            return new Food(
+                    Splitter.on(' ').splitToList(line.substring(0, split)),
+                    Splitter.on(", ").splitToList(allergenText));
+
+        }).collect(toList());
+
+        Set<String> allIngr = foods.stream().flatMap(f -> f.ingr.stream()).collect(toSet());
+        Set<String> allAll = foods.stream().flatMap(f -> f.allergens.stream()).collect(toSet());
         for (String string : allAll) {
             poss.put(string, new TreeSet<>(allIngr));
         }
 
-        for (String line : SUtils.lines(in)) {
-
-            int split = line.indexOf(" (");
-            List<String> ingr = Splitter.on(' ').splitToList(line.substring(0, split));
-            var allergens = Splitter.on(", ")
-                    .splitToList(line.substring(split+", (contains".length(), line.length() - 1));
-
-            for (var a : allergens) {
-                poss.get(a).retainAll(ingr);
+        for (Food food : foods) {
+            for (var a : food.allergens) {
+                poss.get(a).retainAll(food.ingr);
             }
         }
 
@@ -65,7 +63,7 @@ public class Day21 extends Base {
             for (Set<String> allergens : poss.values()) {
                 if (allergens.size() == 1) {
                     var all = allergens.iterator().next();
-                    for (Entry<String, Set<String>> e : poss.entrySet()) {
+                    for (var e : poss.entrySet()) {
                         if (e.getValue().size() > 1 && e.getValue().contains(all)) {
                             change = true;
                             e.getValue().removeAll(allergens);
@@ -82,11 +80,8 @@ public class Day21 extends Base {
         System.out.println("No allergens: " + none.size());
 
         long found = 0;
-        for (String line : SUtils.lines(in)) {
-
-            int split = line.indexOf(" (");
-            List<String> ingr = Splitter.on(' ').splitToList(line.substring(0, split));
-            for (String i : ingr) {
+        for (Food food : foods) {
+            for (String i : food.ingr) {
                 if (none.contains(i)) {
                     found++;
                 }
@@ -99,5 +94,4 @@ public class Day21 extends Base {
         }
         System.out.println("P2: " + Joiner.on(",").join(p2));
     }
-
 }
