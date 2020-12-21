@@ -12,12 +12,14 @@ import java.util.TreeSet;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import framework.AocMeta;
 import framework.Base;
 import util.SUtils;
 
-public class Day21 extends Base {
+@AocMeta(notes = "logic")
+public class Day21_AllergenAssessment extends Base {
     public static void main(String[] args) {
-        Base.run(Day21::new, 1);
+        Base.run(Day21_AllergenAssessment::new, 1);
     }
 
     @Override
@@ -28,14 +30,17 @@ public class Day21 extends Base {
                 + "sqjhc mxmxvkd sbzzf (contains fish)";
     }
 
-    // ALLERGEN => ingredients
-    Map<String, Set<String>> poss = new TreeMap<>();
+    @Override public Object testExpect1() { return 5L; }
+    @Override public Object testExpect2() { return "mxmxvkd,sqjhc,fvjkl"; }
+    @Override public Object expect1() { return 1913L; }
+    @Override public Object expect2() { return "gpgrb,tjlz,gtjmd,spbxz,pfdkkzp,xcfpc,txzv,znqbr"; }
+
+    record Food(List<String> ingr, List<String> allergens) {}
+    List<Food> foods;
 
     @Override
     public void parse(String in) {
-        record Food(List<String> ingr, List<String> allergens) {}
-
-        var foods = SUtils.lines(in).stream().map(line -> {
+        foods = SUtils.lines(in).stream().map(line -> {
             int split = line.indexOf(" (");
             String allergenText = line.substring(split + ", (contains".length(), line.length() - 1);
             return new Food(
@@ -43,7 +48,13 @@ public class Day21 extends Base {
                     Splitter.on(", ").splitToList(allergenText));
 
         }).collect(toList());
+    }
 
+    /** ALLERGEN => ingredients */
+    Map<String, Set<String>> poss = new TreeMap<>();
+
+    @Override
+    public Long part1() {
         Set<String> allIngr = foods.stream().flatMap(f -> f.ingr.stream()).collect(toSet());
         Set<String> allAll = foods.stream().flatMap(f -> f.allergens.stream()).collect(toSet());
         for (String string : allAll) {
@@ -77,8 +88,6 @@ public class Day21 extends Base {
         for (Set<String> set : poss.values()) {
             none.removeAll(set);
         }
-        System.out.println("No allergens: " + none.size());
-
         long found = 0;
         for (Food food : foods) {
             for (String i : food.ingr) {
@@ -87,11 +96,15 @@ public class Day21 extends Base {
                 }
             }
         }
-        System.out.println("Appear: " + found);
+        return found;
+    }
+
+    @Override
+    public String part2() {
         var p2 = new ArrayList<>();
         for (Set<String> s : poss.values()) {
             p2.add(s.iterator().next());
         }
-        System.out.println("P2: " + Joiner.on(",").join(p2));
+        return Joiner.on(",").join(p2);
     }
 }
