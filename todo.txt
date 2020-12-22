@@ -23,3 +23,6 @@ Day 19 (parsing) - oh, so many ideas...
 
  Day 21:
  - Another scenario for a rules engine (different logic, but can reuse process-of-elimination)
+
+ Day 22:
+ - Perf: Oow, the boxed integers & array shifting hurts! Fixed-size circular buffers?

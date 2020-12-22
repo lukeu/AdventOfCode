@@ -8,8 +8,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
 import framework.AocMeta;
 import framework.Base;
 import util.SUtils;
@@ -78,12 +76,8 @@ public class Day22_CrabCombat extends Base {
         return p2.isEmpty();
     }
 
-    long hash(List<Integer> p1, List<Integer> p2) {
-        Hasher hasher = Hashing.goodFastHash(64).newHasher();
-        p1.stream().forEach(hasher::putInt);
-        hasher.putLong(-1L);
-        p2.stream().forEach(hasher::putInt);
-        return hasher.hash().asLong();
+    long hash(List<Integer> a, List<Integer> b) {
+        return ((long) a.hashCode()) << 32 | b.hashCode();
     }
 
     long score(Collection<Integer> winner) {
