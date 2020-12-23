@@ -18,21 +18,21 @@ public class Day23_CrabCups extends Base {
     }
     @Override public Object testExpect1() { return "67384529"; }
     @Override public Object testExpect2() { return 149245887792L; }
+    @Override public Object expect1() { return "47598263"; }
+    @Override public Object expect2() { return 248009574232L; }
 
-    /** A doubly-linked list where each node retains a fixed pointer to the cup 'one lower'. */
+    /** A singly-linked list node, carrying an extra fixed pointer to the cup 'one lower'. */
     class Cup {
         Cup(int i) {
             id = i;
         }
         int id;
         Cup next;
-        Cup prev;
         Cup lower;
 
         @Override
         public String toString() {
-            return String.format(
-                    " %s<-%s->%s ", prev == null ? "." : prev.id, id, next == null ? "." : next.id);
+            return String.format(" (%s)->%s ", id, next == null ? "." : next.id);
         }
     }
 
@@ -46,7 +46,6 @@ public class Day23_CrabCups extends Base {
     @Override
     public String part1() {
         Cup current = build(original.length);
-
         play(current, 100);
 
         Cup one = findOne(current);
@@ -56,7 +55,6 @@ public class Day23_CrabCups extends Base {
     @Override
     public Long part2() {
         Cup current = build(1_000_000);
-
         play(current, 10_000_000);
 
         Cup one = findOne(current);
@@ -64,24 +62,17 @@ public class Day23_CrabCups extends Base {
     }
 
     private Cup build(int size) {
-        var cups = new ArrayList<Cup>();
-
-        // Populate linking backwards
-        Cup prev = null;
-        for (int j = 0; j < size; j++) {
+        var cups = new ArrayList<Cup>(size);
+        Cup cup = new Cup(original[0] - '0');
+        for (int j = 1; j < size; j++) {
+            cups.add(cup);
             int id = j < original.length ? original[j] - '0' : j+1;
-            Cup c = new Cup(id);
-            c.prev = prev;
-            cups.add(c);
-            prev = c;
+            cup.next = new Cup(id);
+            cup = cup.next;
         }
+        cups.add(cup);
         Cup current = cups.get(0);
-        current.prev = prev;
-
-        // Link forwards
-        for (Cup c : cups) {
-            c.prev.next = c;
-        }
+        cup.next = current;
 
         // Link each cup to the one numerically lower
         cups.sort(Comparator.comparing(c -> c.id));
@@ -101,26 +92,21 @@ public class Day23_CrabCups extends Base {
 
             // Remove 3 items
             Cup link = take.next.next.next;
-            join(current, link);
+            current.next = link;
 
-            // Find the dest that isn't in the removed chain
+            // Find the dest cup - one that isn't in the removed chain
             Cup dest = current.lower;
             while (dest == take || dest == take.next || dest == take.next.next) {
                 dest = dest.lower;
             }
 
-            // Insert chain of 3 @ d
+            // Insert the chain of 3 @ dest
             Cup after = dest.next;
-            join(dest, take);
-            join(take.next.next, after);
+            dest.next = take;
+            take.next.next.next = after;
 
             current = current.next;
         }
-    }
-
-    private void join(Cup a, Cup b) {
-        a.next = b;
-        b.prev = a;
     }
 
     private Cup findOne(Cup c) {
