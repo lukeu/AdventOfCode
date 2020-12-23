@@ -1,7 +1,8 @@
 package aoc2020;
 
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import framework.AocMeta;
 import framework.Base;
@@ -62,17 +63,15 @@ public class Day23_CrabCups extends Base {
     }
 
     private Cup build(int size) {
-        var cups = new ArrayList<Cup>(size);
-        Cup cup = new Cup(original[0] - '0');
-        for (int j = 1; j < size; j++) {
-            cups.add(cup);
-            int id = j < original.length ? original[j] - '0' : j+1;
-            cup.next = new Cup(id);
-            cup = cup.next;
+        var cups = IntStream.range(0, size)
+            .mapToObj(i -> new Cup(i < original.length ? original[i] - '0' : i+1))
+            .collect(Collectors.toList());
+
+        Cup prev = cups.get(size - 1);
+        for (Cup c : cups) {
+            prev.next = c;
+            prev = c;
         }
-        cups.add(cup);
-        Cup current = cups.get(0);
-        cup.next = current;
 
         // Link each cup to the one numerically lower
         cups.sort(Comparator.comparing(c -> c.id));
@@ -82,7 +81,7 @@ public class Day23_CrabCups extends Base {
             lower = c;
         }
 
-        return current;
+        return prev.next;
     }
 
     private void play(Cup current, int moves) {
@@ -105,7 +104,7 @@ public class Day23_CrabCups extends Base {
             dest.next = take;
             take.next.next.next = after;
 
-            current = current.next;
+            current = link;
         }
     }
 
