@@ -46,29 +46,28 @@ public class Day24_LobbyLayout extends Base {
         NE(0,-1),
         NW(-1,-1),
         E(1,0),
-        W(-1,0)
-        ;
-
+        W(-1,0);
         private Dir(int dx, int dy) {
             this.dx = dx;
             this.dy = dy;
         }
-        int dx;
-        int dy;
+        final int dx;
+        final int dy;
     }
 
-    int SIZE = 140;
-    int REF = SIZE / 2;
-    boolean [] tiles = new boolean[SIZE*SIZE];
+    private static final int SIZE = 140;
+    private static final int REF = SIZE / 2;
+    boolean[] tiles = new boolean[SIZE*SIZE];
 
     @Override
     public void parse(String in) {
         for (String line : SUtils.lines(in)) {
             int x = REF;
             int y = REF;
+            line = line.toUpperCase();
             while (!line.isEmpty()) {
                 for (Dir d : Dir.values()) {
-                    if (line.startsWith(d.name().toLowerCase())) {
+                    if (line.startsWith(d.name())) {
                         x += d.dx;
                         y += d.dy;
                         line = line.substring(d.name().length());
@@ -76,7 +75,7 @@ public class Day24_LobbyLayout extends Base {
                 }
 
             }
-            tiles[y*SIZE + x] ^= true;
+            tiles[at(x, y)] ^= true;
         }
     }
 
@@ -92,35 +91,41 @@ public class Day24_LobbyLayout extends Base {
     @Override
     public Long part2() {
         for (int n = 0; n < 100; n++) {
-            boolean[] next = Arrays.copyOf(tiles, tiles.length);
-            for (int y = 1; y < SIZE - 1; y++) {
-                for (int x = 1; x < SIZE - 1; x++) {
-                    int c = countAround(x, y);
-                    if (tiles[y*SIZE + x]) {
-                        if (c == 0 || c > 2) {
-                            next[y*SIZE + x] = false;
-                        }
-                    } else {
-                        if (c == 2) {
-                            next[y*SIZE + x] = true;
-                        }
+            tiles = iterate();
+        }
+        return part1();
+    }
+
+    private boolean[] iterate() {
+        boolean[] next = Arrays.copyOf(tiles, tiles.length);
+        for (int y = 1; y < SIZE - 1; y++) {
+            for (int x = 1; x < SIZE - 1; x++) {
+                int c = countAround(x, y);
+                if (tiles[at(x, y)]) {
+                    if (c == 0 || c > 2) {
+                        next[at(x, y)] = false;
+                    }
+                } else {
+                    if (c == 2) {
+                        next[at(x, y)] = true;
                     }
                 }
             }
-            tiles = next;
         }
-
-
-        return part1();
+        return next;
     }
 
     int countAround(int x, int y) {
         int c = 0;
         for (Dir d : Dir.values()) {
-            if (tiles[(y+d.dy) * SIZE + (x + d.dx)]) {
+            if (tiles[at(x + d.dx, y + d.dy)]) {
                 c++;
             }
         }
         return c;
+    }
+
+    private int at(int x, int y) {
+        return y*SIZE + x;
     }
 }
