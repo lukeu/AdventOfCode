@@ -58,9 +58,11 @@ public class Day24_LobbyLayout extends Base {
     private static final int SIZE = 140;
     private static final int REF = SIZE / 2;
     boolean[] tiles = new boolean[SIZE*SIZE];
+    int minx, miny, maxx, maxy;
 
     @Override
     public void parse(String in) {
+        minx = maxx = miny = maxy = REF;
         for (String line : SUtils.lines(in)) {
             int x = REF;
             int y = REF;
@@ -73,9 +75,19 @@ public class Day24_LobbyLayout extends Base {
                         line = line.substring(d.name().length());
                     }
                 }
-
             }
+            updateRange(x, y);
             tiles[at(x, y)] ^= true;
+        }
+    }
+
+    private void updateRange(int x, int y) {
+        if (x < minx) minx = x;
+        if (x > maxx) maxx = x;
+        if (y < miny) miny = y;
+        if (y > maxy) maxy = y;
+        if (minx < 2 || maxx >= SIZE-2 || miny < 2 || maxy >= SIZE-2) {
+            throw new IllegalStateException("OoB");
         }
     }
 
@@ -98,8 +110,12 @@ public class Day24_LobbyLayout extends Base {
 
     private boolean[] iterate() {
         boolean[] next = Arrays.copyOf(tiles, tiles.length);
-        for (int y = 1; y < SIZE - 1; y++) {
-            for (int x = 1; x < SIZE - 1; x++) {
+        int x1 = minx - 1;
+        int x2 = maxx + 1;
+        int y1 = miny - 1;
+        int y2 = maxy + 1;
+        for (int y = y1; y <= y2; y++) {
+            for (int x = x1; x <= x2; x++) {
                 int c = countAround(x, y);
                 if (tiles[at(x, y)]) {
                     if (c == 0 || c > 2) {
@@ -107,6 +123,7 @@ public class Day24_LobbyLayout extends Base {
                     }
                 } else {
                     if (c == 2) {
+                        updateRange(x, y);
                         next[at(x, y)] = true;
                     }
                 }
