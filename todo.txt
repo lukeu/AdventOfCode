@@ -26,3 +26,6 @@ Day 19 (parsing) - oh, so many ideas...
 
  Day 22:
  - Perf: Oow, the boxed integers & array shifting hurts! Fixed-size circular buffers?
+
+ Day 25:
+ - Perf: run 2 threads, first to complete wins.
