@@ -30,20 +30,20 @@ public class Day15_RambunctiousRecitation extends Base {
     }
 
     long play(int numTurns) {
-        Map<Integer, Integer> history = new HashMap<>();
+        int[] history = new int[numTurns]; // dictionary [ number-spoken => turn-spoken ]
 
         int turn = 1;
         for (int i : in) {
-            history.put(i, turn++);
+            history[i] = turn++;
         }
         int speek = in[in.length - 1];
-        history.remove(speek);
+        history[speek] = 0;
 
         for ( ; turn <= numTurns; turn++) {
             int spoken = speek;
-            Integer prev = history.get(spoken);
-            speek = (prev == null) ? 0 : (turn - prev - 1);
-            history.put(spoken, turn - 1);
+            int prev = history[spoken];
+            speek = (prev == 0) ? 0 : (turn - prev - 1);
+            history[spoken] = turn - 1;
         }
 
         return speek;
