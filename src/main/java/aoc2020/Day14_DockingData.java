@@ -8,16 +8,28 @@ import java.util.Map;
 
 import framework.AocMeta;
 import framework.Base;
-import util.FUtils;
 import util.SUtils;
 
-@AocMeta(notes = "Bit masks")
+@AocMeta(notes = "Floating bit-masks")
 public class Day14_DockingData extends Base {
     public static void main(String[] args) {
         Base.run(Day14_DockingData::new, 1);
     }
 
+    @Override
+    public String testInput() { // Part 2 only
+        return "mask = 000000000000000000000000000000X1001X\n"
+                + "mem[42] = 100\n"
+                + "mask = 00000000000000000000000000000000X0XX\n"
+                + "mem[26] = 1";
+    }
+    @Override public Object testExpect2() { return 208L; }
+    @Override public Object expect1() { return 4886706177792L; }
+    @Override public Object expect2() { return 3348493585827L; }
+
     private static final int NBITS = 36;
+
+    List<String> in;
     Map<Long, Long> mem1 = new HashMap<>();
     Map<Long, Long> mem2 = new HashMap<>();
     long andMask;
@@ -25,9 +37,13 @@ public class Day14_DockingData extends Base {
     List<Integer> xx;
 
     @Override
-    public void go() {
+    public void parse(String text) {
         andMask = orMask = 0;
-        var in = FUtils.readLines(2020, 14);
+        in = SUtils.lines(text);
+    }
+
+    @Override
+    public Long part1() {
         for (String s : in) {
             if (s.startsWith("mask = ")) {
                 String mask = s.substring(7);
@@ -47,6 +63,7 @@ public class Day14_DockingData extends Base {
                 long val = pair[1];
                 mem1.put(addr, ((val & andMask) | orMask));
 
+                // An addition hacked-in for Part 2
                 for (int j = 0; j < (1 << xx.size()); j++) {
                     long[] aom = makeAndOrMask(j);
                     long addr2 = (addr & aom[0]) | aom[1] | orMask;
@@ -55,9 +72,12 @@ public class Day14_DockingData extends Base {
             }
         }
 
-        System.out.println("mem entries: " + mem2.size());
-        System.out.println("Part 1: " + mem1.values().stream().mapToLong(i -> i).sum());
-        System.out.println("Part 2: " + mem2.values().stream().mapToLong(i -> i).sum());
+        return mem1.values().stream().mapToLong(i -> i).sum();
+    }
+
+    @Override
+    public Object part2() {
+        return mem2.values().stream().mapToLong(i -> i).sum();
     }
 
     private long[] makeAndOrMask(int n) {
