@@ -3,9 +3,9 @@ package aoc2020;
 import util.FUtils;
 import util.Util;
 
-public class Day01 {
+public class Day01_ReportRepair {
     public static void main(String[] args) {
-        Util.profile(() -> new Day01().go(), 1);
+        Util.profile(() -> new Day01_ReportRepair().go(), 1);
     }
 
     void go() {

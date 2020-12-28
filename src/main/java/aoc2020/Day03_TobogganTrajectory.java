@@ -3,9 +3,9 @@ package aoc2020;
 import util.FUtils;
 import util.Util;
 
-public class Day03 {
+public class Day03_TobogganTrajectory {
     public static void main(String[] args) {
-        Util.profile(() -> new Day03().go(), 1);
+        Util.profile(() -> new Day03_TobogganTrajectory().go(), 1);
     }
 
     void go() {

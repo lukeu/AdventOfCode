@@ -3,9 +3,9 @@ package aoc2020;
 import util.FUtils;
 import util.Util;
 
-public class Day05 {
+public class Day05_BinaryBoarding {
     public static void main(String[] args) {
-        Util.profile(() -> new Day05().go(), 1);
+        Util.profile(() -> new Day05_BinaryBoarding().go(), 1);
     }
 
     // New and improved, learning for next time. (See git history for the 'under pressure' version)

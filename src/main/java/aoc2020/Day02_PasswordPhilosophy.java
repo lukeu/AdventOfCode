@@ -5,9 +5,9 @@ import java.util.regex.Pattern;
 import util.FUtils;
 import util.Util;
 
-public class Day02 {
+public class Day02_PasswordPhilosophy {
     public static void main(String[] args) {
-        Util.profile(() -> new Day02().go(), 1);
+        Util.profile(() -> new Day02_PasswordPhilosophy().go(), 1);
     }
 
     // Example input

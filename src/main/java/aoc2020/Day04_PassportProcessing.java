@@ -11,9 +11,9 @@ import com.google.common.primitives.Ints;
 import util.FUtils;
 import util.Util;
 
-public class Day04 {
+public class Day04_PassportProcessing {
     public static void main(String[] args) {
-        Util.profile(() -> new Day04().go(), 1);
+        Util.profile(() -> new Day04_PassportProcessing().go(), 1);
     }
 
     Set<String> keys = Set.of(
