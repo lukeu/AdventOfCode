@@ -21,7 +21,7 @@ public class Day07_HandyHaversacks extends Base {
 
     SetMultimap<String, Pair> rules = HashMultimap.create();
 
-    Pattern PAT = Pattern.compile("(\\d)+ (\\w+ \\w+) bag");
+    private static final Pattern PAT = Pattern.compile("(\\d)+ (\\w+ \\w+) bag");
 
     @Override
     public void parse(String text) {
@@ -38,23 +38,16 @@ public class Day07_HandyHaversacks extends Base {
     public Object part1() {
         int found = 0;
         for (String start : rules.keySet()) {
-            if (!start.equals("shiny gold") && hasGold(start)) {
+            if (hasGold(start)) {
                 ++ found;
             }
         }
-        return found;
+        return found - 1; // exclude the 'shiny gold' rule itself
     }
 
     boolean hasGold(String bag) {
-        if (bag.equals("shiny gold")) {
-            return true;
-        }
-        for (Pair c : rules.get(bag)) {
-            if (hasGold(c.colour)) {
-                return true;
-            }
-        }
-        return false;
+        return bag.equals("shiny gold") ||
+                rules.get(bag).stream().anyMatch(r -> hasGold(r.colour));
     }
 
     @Override
