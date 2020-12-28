@@ -8,9 +8,9 @@ import com.google.common.collect.Multiset.Entry;
 import com.google.common.collect.Sets;
 import util.FUtils;
 
-public class Day06 {
+public class Day06_CustomCustoms {
     public static void main(String[] args) {
-        new Day06().best();
+        new Day06_CustomCustoms().best();
     }
 
     /**
