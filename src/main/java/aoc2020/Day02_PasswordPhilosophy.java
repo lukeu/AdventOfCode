@@ -1,7 +1,5 @@
 package aoc2020;
 
-import java.util.regex.Pattern;
-
 import framework.Base;
 import util.SUtils;
 
@@ -34,14 +32,13 @@ public class Day02_PasswordPhilosophy extends Base {
 
     @Override
     public void parse(String text) {
-        var pattern = Pattern.compile("[-: ]+");
         for (String s : SUtils.lines(text)) {
-
-            String[] sp = pattern.split(s);
-            int min = Integer.parseInt(sp[0]);
-            int max = Integer.parseInt(sp[1]);
-            char ch = sp[2].charAt(0);
-            String str = sp[3];
+            int i = s.indexOf('-');
+            int j = s.indexOf(':');
+            int min = Integer.parseInt(s.substring(0, i));
+            int max = Integer.parseInt(s.substring(i+1, j-2));
+            char ch = s.charAt(j-1);
+            String str = s.substring(j+2);
 
             int count = (int) str.chars().filter(c -> c == ch).count();
             if (count >= min && count <= max) {
