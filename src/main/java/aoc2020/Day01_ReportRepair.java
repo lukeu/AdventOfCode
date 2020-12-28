@@ -1,24 +1,34 @@
 package aoc2020;
 
-import util.FUtils;
-import util.Util;
+import framework.Base;
+import util.SUtils;
 
-public class Day01_ReportRepair {
+public class Day01_ReportRepair extends Base {
+
     public static void main(String[] args) {
-        Util.profile(() -> new Day01_ReportRepair().go(), 1);
+        Base.run(Day01_ReportRepair::new, 1);
     }
 
-    void go() {
-        int[] in = FUtils.readLineInts(2020, 1);
+    @Override public Object expect2() { return 193598720; }
+
+    int[] in;
+
+    @Override
+    public void parse(String text) {
+        in = SUtils.lineInts(text);
+    }
+
+    @Override
+    public Object part2() {
         for (int a : in) {
             for (int b : in) {
                 for (int c : in) {
                     if (a + b + c == 2020) {
-                        System.out.println(a*b*c);
-                        return;
+                        return a*b*c;
                     }
                 }
             }
         }
+        return null;
     }
 }

@@ -2,37 +2,42 @@ package aoc2020;
 
 import java.util.regex.Pattern;
 
-import util.FUtils;
-import util.Util;
+import framework.Base;
+import util.SUtils;
 
-public class Day02_PasswordPhilosophy {
+public class Day02_PasswordPhilosophy extends Base {
+
     public static void main(String[] args) {
-        Util.profile(() -> new Day02_PasswordPhilosophy().go(), 1);
+        Base.run(Day02_PasswordPhilosophy::new, 1);
     }
 
-    // Example input
-    // 7-8 l: lllllzllbfl
+    @Override
+    public String testInput() {
+        return "1-3 a: abcde\n"
+                + "1-3 b: cdefg\n"
+                + "2-9 c: ccccccccc";
+    }
 
-    // Alternatives...
-    //
-    // * Too fragile & slow to code
-    //     var p = Pattern.compile("(\\d+)\\-(\\d+) (.)\\: (.*)");
-    //
-    // * Best for speed-coding: (poor perf)
+    @Override public Object testExpect1() { return 2; }
+    @Override public Object testExpect2() { return 1; }
+    @Override public Object expect1() { return 645; }
+    @Override public Object expect2() { return 737; }
+
+    // Best for speed-coding: (but performs poorly)
     //
     //    var scan = new Scanner(s);
     //    scan.useDelimiter("[-: ]+");
     //    int min = scan.nextInt();
 
-    void go() {
-        int part1 = 0;
-        int part2 = 0;
+    int part1 = 0;
+    int part2 = 0;
 
-        var p = Pattern.compile("[-: ]+");
-        var in = FUtils.readLines(2020, 2);
-        for (String s : in) {
+    @Override
+    public void parse(String text) {
+        var pattern = Pattern.compile("[-: ]+");
+        for (String s : SUtils.lines(text)) {
 
-            String[] sp = p.split(s);
+            String[] sp = pattern.split(s);
             int min = Integer.parseInt(sp[0]);
             int max = Integer.parseInt(sp[1]);
             char ch = sp[2].charAt(0);
@@ -46,7 +51,15 @@ public class Day02_PasswordPhilosophy {
                 part2 ++;
             }
         }
-        System.out.println("Part 1: " + part1);
-        System.out.println("Part 2: " + part2);
+    }
+
+    @Override
+    public Object part1() {
+        return part1;
+    }
+
+    @Override
+    public Object part2() {
+        return part2;
     }
 }

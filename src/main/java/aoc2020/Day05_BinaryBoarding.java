@@ -1,18 +1,30 @@
 package aoc2020;
 
-import util.FUtils;
-import util.Util;
+import java.util.List;
 
-public class Day05_BinaryBoarding {
+import framework.Base;
+import util.SUtils;
+
+public class Day05_BinaryBoarding extends Base {
     public static void main(String[] args) {
-        Util.profile(() -> new Day05_BinaryBoarding().go(), 1);
+        Base.run(Day05_BinaryBoarding::new, 1);
+    }
+
+    @Override public Object expect1() { return 980; }
+    @Override public Object expect2() { return 607; }
+
+    List<String> in;
+    boolean[] found = new boolean[1024];
+
+    @Override
+    public void parse(String text) {
+        in = SUtils.lines(text);
     }
 
     // New and improved, learning for next time. (See git history for the 'under pressure' version)
-    void go() {
+    @Override
+    public Object part1() {
         int max = 0;
-        boolean[] found = new boolean[1024];
-        var in = FUtils.readLines(2020, 5);
 
         for (var a : in) {
             a = a.replace('F', '0').replace('B', '1');
@@ -21,19 +33,21 @@ public class Day05_BinaryBoarding {
             int seat = Integer.parseInt(a.substring(7, 10), 2);
             int id = row * 8 + seat; // or just parse 'a' itself
 
-            //System.out.println(id + "\t" + row + ":" + seat);
             found[id] = true;
-            if (row > max) {
-                max = row;
+            if (id > max) {
+                max = id;
             }
         }
-        System.out.println("Part 1: " + max);
+        return max;
+    }
 
-        // For part 2 just scan the output visually - skip the last bit of code
-        for (int i = 8; i < found.length - 1; i++) {
-            if (!found[i]) {
-                System.out.println(i);
+    @Override
+    public Object part2() {
+        for (int i = 9; i < found.length - 2; i++) {
+            if (found[i-1] && !found[i] && found[i+1]) {
+                return i;
             }
         }
+        return null;
     }
 }

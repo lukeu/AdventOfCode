@@ -1,17 +1,27 @@
 package aoc2020;
 
-import util.FUtils;
-import util.Util;
+import java.util.List;
 
-public class Day03_TobogganTrajectory {
+import framework.Base;
+import util.SUtils;
+
+public class Day03_TobogganTrajectory extends Base {
     public static void main(String[] args) {
-        Util.profile(() -> new Day03_TobogganTrajectory().go(), 1);
+        Base.run(Day03_TobogganTrajectory::new, 1);
     }
 
-    void go() {
+    @Override public Object expect2() { return 2832009600L; }
 
+    List<String> in;
+
+    @Override
+    public void parse(String text) {
+        in = SUtils.lines(text);
+    }
+
+    @Override
+    public Object part2() {
         long total = 1;
-        var in = FUtils.readLines(2020, 3);
         int w = in.get(0).length();
         for (int i : new int []{1,3,5,7}) {
             int x = 0;
@@ -22,7 +32,6 @@ public class Day03_TobogganTrajectory {
                 }
                 x += i;
             }
-            System.out.println(found);
             total *= found;
         }
 
@@ -35,7 +44,6 @@ public class Day03_TobogganTrajectory {
             }
             x += 1;
         }
-        System.out.println(found);
-        System.out.println(total * found);
+        return total * found;
     }
 }
