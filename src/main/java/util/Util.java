@@ -1,6 +1,7 @@
 package util;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 public class Util {
 
@@ -11,6 +12,15 @@ public class Util {
             long t1 = System.nanoTime();
             System.out.format("Time to run: %.2f ms\n", (t1 - t0) / 1000000f);
         }
+    }
+
+    /** For primitives, do instead like: Arrays.stream(arr, start, end).sum()  */
+    public static long sumBoxed(Collection<? extends Number> coll) {
+        long sum = 0;
+        for (Number n : coll) {
+            sum += n.longValue();
+        }
+        return sum;
     }
 
     public static long max(int[] arr) {
