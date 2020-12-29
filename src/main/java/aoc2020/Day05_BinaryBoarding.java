@@ -3,7 +3,7 @@ package aoc2020;
 import java.util.List;
 
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 public class Day05_BinaryBoarding extends Base {
     public static void main(String[] args) {
@@ -17,8 +17,8 @@ public class Day05_BinaryBoarding extends Base {
     boolean[] found = new boolean[1024];
 
     @Override
-    public void parse(String text) {
-        in = SUtils.lines(text);
+    public void parse(Input input) {
+        in = input.lines();
     }
 
     // New and improved, learning for next time. (See git history for the 'under pressure' version)

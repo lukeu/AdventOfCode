@@ -3,7 +3,7 @@ package aoc2020;
 import java.util.List;
 
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 public class Day03_TobogganTrajectory extends Base {
     public static void main(String[] args) {
@@ -15,8 +15,8 @@ public class Day03_TobogganTrajectory extends Base {
     List<String> in;
 
     @Override
-    public void parse(String text) {
-        in = SUtils.lines(text);
+    public void parse(Input input) {
+        in = input.lines();
     }
 
     @Override

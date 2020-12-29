@@ -1,7 +1,7 @@
 package aoc2020;
 
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 public class Day02_PasswordPhilosophy extends Base {
 
@@ -31,8 +31,8 @@ public class Day02_PasswordPhilosophy extends Base {
     int part2 = 0;
 
     @Override
-    public void parse(String text) {
-        for (String s : SUtils.lines(text)) {
+    public void parse(Input input) {
+        for (String s : input.lines()) {
             int i = s.indexOf('-');
             int j = s.indexOf(':');
             int min = Integer.parseInt(s.substring(0, i));

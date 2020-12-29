@@ -1,7 +1,7 @@
 package aoc2020;
 
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 public class Day01_ReportRepair extends Base {
 
@@ -14,8 +14,8 @@ public class Day01_ReportRepair extends Base {
     int[] in;
 
     @Override
-    public void parse(String text) {
-        in = SUtils.lineInts(text);
+    public void parse(Input input) {
+        in = input.ints();
     }
 
     @Override

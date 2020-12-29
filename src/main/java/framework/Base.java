@@ -2,7 +2,6 @@ package framework;
 
 import java.util.function.Supplier;
 
-import util.FUtils;
 import util.Util;
 
 public class Base {
@@ -37,7 +36,7 @@ public class Base {
         if (testInput.isEmpty()) {
             return;
         }
-        parse(testInput);
+        parse(new Input(testInput));
         printAndCheck("Test 1: ", testExpect1(), part1());
         printAndCheck("Test 2: ", testExpect2(), part2());
     }
@@ -75,6 +74,12 @@ public class Base {
         return Integer.parseInt(getClass().getSimpleName().substring(3,5));
     }
 
+    public void parse(Input input) {
+        if (input != null) {
+            parse(input.text());
+        }
+    }
+
     public void parse(String text) {
     }
 
@@ -89,11 +94,11 @@ public class Base {
     }
 
 
-    public String input() {
+    public Input input() {
         if (!profiling && !m_quiet) {
-            System.out.println("Reading: " + FUtils.resourceName(year(), day()));
+            System.out.println("Reading: " + Input.resourceName(year(), day()));
         }
-        return FUtils.readString(year(), day());
+        return new Input(year(), day());
     }
 
     public Object part1() {

@@ -12,7 +12,7 @@ import com.google.common.collect.Sets.SetView;
 import com.google.common.primitives.Ints;
 import framework.AocMeta;
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 @AocMeta(notes = "input validation")
 public class Day04_PassportProcessing extends Base {
@@ -37,9 +37,8 @@ public class Day04_PassportProcessing extends Base {
     List<Map<String, String>> passports = new ArrayList<>();
 
     @Override
-    public void parse(String text) {
-        var in = SUtils.blocks(text);
-        for (String s : in) {
+    public void parse(Input input) {
+        for (String s : input.blocks()) {
             var m = new HashMap<String, String>();
             for (String field : s.split("\\s+")) {
                 var f = field.split(":");
