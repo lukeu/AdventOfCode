@@ -3,9 +3,11 @@ package aoc2020;
 import java.util.Arrays;
 import java.util.List;
 
+import framework.AocMeta;
 import framework.Base;
 import framework.Input;
 
+@AocMeta(notes = "cellular automa 1")
 public class Day11_SeatingSystem extends Base {
     public static void main(String[] args) {
         Base.run(Day11_SeatingSystem::new, 1);
