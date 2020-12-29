@@ -1,6 +1,7 @@
 package aoc2020;
 
 import java.util.Arrays;
+import java.util.List;
 
 import framework.Base;
 import framework.Input;
@@ -13,6 +14,7 @@ public class Day11_SeatingSystem extends Base {
     @Override public Object expect2() { return 2131; }
 
     int width, len;
+    List<String> in;
     char[] grid;
     char[] prev;
 
@@ -33,9 +35,6 @@ public class Day11_SeatingSystem extends Base {
 
     @Override
     public Integer part2() {
-
-        prev = Arrays.copyOf(grid, grid.length);
-
         do {
             prev = Arrays.copyOf(grid, grid.length);
             iterate();
@@ -59,48 +58,24 @@ public class Day11_SeatingSystem extends Base {
         }
     }
 
-    public enum Dir {
-        E(1,0),
-        S(0,1),
-        W(-1,0),
-        N(0,-1),
-        NW(-1,-1),
-        NE(1, -1),
-        SW(-1,1),
-        SE(1,1);
-        private Dir(int dx, int dy) {
-            this.dx = dx;
-            this.dy = dy;
-        }
-        public int dx;
-        public int dy;
-    }
-
     private char rules(int x, int y) {
         int occupied = 0;
-        for (Dir d : Dir.values()) {
-            for (int i = 1; i < width; i++) {
-                int nx = x + i * d.dx;
-                int ny = y + i * d.dy;
-                if (at(nx,ny) != '.') {
-                    if (at(nx, ny) == '#') {
-                        occupied ++;
-                    }
-                    break;
-                }
-            }
-        }
-        /*
-        for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
-                if (i != 0 || j != 0) {
-                    if (at(x+i, y+j) == '#') {
-                        occupied ++;
+
+        for (int dx = -1; dx < 2; dx++) {
+            for (int dy = -1; dy < 2; dy++) {
+                if (dx != 0 || dy != 0) {
+                    for (int m = 1; m < width; m++) {
+                        char ch = at(x+dx*m, y+dy*m);
+                        if (ch == '#') {
+                            occupied ++;
+                        }
+                        if (ch != '.') {
+                            break;
+                        }
                     }
                 }
             }
         }
-        */
         char ch = at(x, y);
         if (ch == 'L' && occupied == 0) {
             return '#';
@@ -112,10 +87,9 @@ public class Day11_SeatingSystem extends Base {
     }
 
     private char at(int x, int y) {
-        int index = y*width + x;
-        if (x < 0 || x >= width || y < 0 || index >= prev.length) {
+        if (x < 0 || x >= width || y < 0 || y >= len) {
             return '.';
         }
-        return prev[index];
+        return prev[y*width + x];
     }
 }
