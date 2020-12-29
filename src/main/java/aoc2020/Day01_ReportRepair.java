@@ -15,16 +15,18 @@ public class Day01_ReportRepair extends Base {
 
     @Override
     public void parse(Input input) {
-        in = input.ints();
+        in = input.lineInts();
     }
 
     @Override
     public Object part2() {
         for (int a : in) {
             for (int b : in) {
-                for (int c : in) {
-                    if (a + b + c == 2020) {
-                        return a*b*c;
+                if (a+b < 2020) {
+                    for (int c : in) {
+                        if (a + b + c == 2020) {
+                            return a*b*c;
+                        }
                     }
                 }
             }
