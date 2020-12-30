@@ -12,6 +12,20 @@ public class Day11_SeatingSystem extends Base {
         Base.run(Day11_SeatingSystem::new, 1);
     }
 
+    @Override
+    public String testInput() {
+        return    "L.LL.LL.LL\n"
+                + "LLLLLLL.LL\n"
+                + "L.L.L..L..\n"
+                + "LLLL.LL.LL\n"
+                + "L.LL.LL.LL\n"
+                + "L.LLLLL.LL\n"
+                + "..L.L.....\n"
+                + "LLLLLLLLLL\n"
+                + "L.LLLLLL.L\n"
+                + "L.LLLLL.LL";
+    }
+    @Override public Object testExpect2() { return 26; }
     @Override public Object expect2() { return 2131; }
 
     private static final int EMPTY = 0, FLOOR = 1, WALL = 2, TAKEN = 100;
