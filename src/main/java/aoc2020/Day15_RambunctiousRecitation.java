@@ -1,5 +1,7 @@
 package aoc2020;
 
+import java.util.BitSet;
+
 import framework.AocMeta;
 import framework.Base;
 import framework.Input;
@@ -31,19 +33,22 @@ public class Day15_RambunctiousRecitation extends Base {
 
     long play(int numTurns) {
         int[] history = new int[numTurns]; // dictionary [ number-spoken => turn-spoken ]
+        var bs = new BitSet(numTurns);
 
         int turn = 0;
         for (int i : in) {
             history[i] = ++turn;
+            bs.set(i);
         }
         int speek = in[in.length - 1];
         history[speek] = 0;
 
         for ( ; turn < numTurns; turn++) {
             int spoken = speek;
-            int prev = history[spoken];
+            int prev = bs.get(spoken) ? history[spoken] : 0;
             speek = (prev == 0) ? 0 : (turn - prev);
             history[spoken] = turn;
+            bs.set(spoken);
         }
 
         return speek;
