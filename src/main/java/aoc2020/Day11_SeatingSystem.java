@@ -51,12 +51,10 @@ public class Day11_SeatingSystem extends Base {
         return found;
     }
 
-    private static final int[] nyarp = new int[0];
-
     int[] findVisibleSeatIndexes(int x, int y) {
         char c = at(x,y);
         if (c == '.') {
-            return nyarp;
+            return null;
         }
         int[] results = new int[8];
         int i = 0;
