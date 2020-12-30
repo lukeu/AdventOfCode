@@ -14,9 +14,11 @@ public class Day11_SeatingSystem extends Base {
 
     @Override public Object expect2() { return 2131; }
 
+    private static final int EMPTY = 0, FLOOR = 1, WALL = 2, TAKEN = 100;
+
     int width, len;
-    char[] grid;
-    char[] prev;
+    int[] grid;
+    int[] prev;
     int[][] visible;
 
     @Override
@@ -25,11 +27,11 @@ public class Day11_SeatingSystem extends Base {
 
         len = in.size();
         width = in.get(0).length();
-        grid = new char[in.size() * width];
+        grid = new int[in.size() * width];
         int n = 0;
         for (String string : in) {
             for (int i = 0; i < string.length(); i++) {
-                grid[n++] = string.charAt(i);
+                grid[n++] = string.charAt(i) == '.' ? FLOOR : EMPTY;
             }
         }
     }
@@ -52,8 +54,8 @@ public class Day11_SeatingSystem extends Base {
     }
 
     int[] findVisibleSeatIndexes(int x, int y) {
-        char c = at(x,y);
-        if (c == '.') {
+        int c = at(x,y);
+        if (c == FLOOR) {
             return null;
         }
         int[] results = new int[8];
@@ -62,9 +64,9 @@ public class Day11_SeatingSystem extends Base {
             for (int dx = -1; dx < 2; dx++) {
                 if (dx != 0 || dy != 0) {
                     for (int m = 1; m < width -1 ; m++) {
-                        char ch = at(x+dx*m, y+dy*m);
-                        if (ch != '.') {
-                            if (ch != '+') {
+                        int ch = at(x+dx*m, y+dy*m);
+                        if (ch != FLOOR) {
+                            if (ch != WALL) {
                                 results[i++] = (y+dy*m) * width + x+dx*m;
                             }
                             break;
@@ -80,8 +82,8 @@ public class Day11_SeatingSystem extends Base {
         int count = 0;
         for (int i = 0; i < prev.length; i++) {
             switch (prev[i]) {
-                case '#' -> { checkLeave(i); count++; }
-                case 'L' -> checkTake(i);
+                case TAKEN -> { checkLeave(i); count++; }
+                case EMPTY -> checkTake(i);
             }
         }
         return count;
@@ -90,11 +92,11 @@ public class Day11_SeatingSystem extends Base {
     /** prev[i] is 'L'. See if grid[i] should be set to '#' */
     void checkTake(int i) {
         for (int seat : visible[i]) {
-            if (prev[seat] == '#') {
+            if (prev[seat] == TAKEN) {
                 return;
             }
         }
-        grid[i] = '#';
+        grid[i] = TAKEN;
     }
 
     /** prev[i] is '#'. See if grid[i] should be set to 'L' */
@@ -103,19 +105,16 @@ public class Day11_SeatingSystem extends Base {
         // NB: this could be a 1-liner using Streams, but this compiles to faster code
         int occupied = 0;
         for (int seat : visible[i]) {
-            char ch = prev[seat];
-            if (ch == '#') {
-                occupied ++;
-            }
+            occupied += prev[seat];
         }
-        if (occupied >= 5) {
-            grid[i] = 'L';
+        if (occupied >= 500) {
+            grid[i] = EMPTY;
         }
     }
 
-    private char at(int x, int y) {
+    private int at(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= len) {
-            return '+';
+            return WALL;
         }
         return prev[y*width + x];
     }
