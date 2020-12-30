@@ -32,18 +32,18 @@ public class Day15_RambunctiousRecitation extends Base {
     long play(int numTurns) {
         int[] history = new int[numTurns]; // dictionary [ number-spoken => turn-spoken ]
 
-        int turn = 1;
+        int turn = 0;
         for (int i : in) {
-            history[i] = turn++;
+            history[i] = ++turn;
         }
         int speek = in[in.length - 1];
         history[speek] = 0;
 
-        for ( ; turn <= numTurns; turn++) {
+        for ( ; turn < numTurns; turn++) {
             int spoken = speek;
             int prev = history[spoken];
-            speek = (prev == 0) ? 0 : (turn - prev - 1);
-            history[spoken] = turn - 1;
+            speek = (prev == 0) ? 0 : (turn - prev);
+            history[spoken] = turn;
         }
 
         return speek;
