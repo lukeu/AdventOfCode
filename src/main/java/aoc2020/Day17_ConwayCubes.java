@@ -128,29 +128,17 @@ public class Day17_ConwayCubes extends Base {
 
     @SuppressWarnings("unused")
     private void printCube() {
-        for (int w = 0; w < SIZE; w++) {
-            for (int z = 0; z < SIZE; z++) {
-                if (hasPoint(z, w)) {
-                    System.out.println("\nZ=" + z + ", W=" + w);
-                    for (int y = 1; y < SIZE-1; y++) {
-                        for (int x = 1; x < SIZE-1; x++) {
-                            System.out.print(at(x, y, z, w) ? '#' : '.');
-                        }
-                        System.out.println();
+        for (int w = min[3]; w <= max[3]; w++) {
+            for (int z = min[2]; z <= max[2]; z++) {
+                System.out.println("\nZ=" + z + ", W=" + w);
+                for (int y = min[1]; y <= max[1]; y++) {
+                    for (int x = min[0]; x <= max[0]; x++) {
+                        System.out.print(at(x, y, z, w) ? '#' : '.');
                     }
+                    System.out.println();
                 }
             }
         }
     }
 
-    private boolean hasPoint(int z, int w) {
-        for (int x = 0; x < SIZE; x++) {
-            for (int y = 0; y < SIZE; y++) {
-                if (at(x, y, z, w)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }
