@@ -12,8 +12,9 @@ public class Day17_ConwayCubes extends Base {
         Base.run(Day17_ConwayCubes::new, 1);
     }
 
-    private static final int SIZE = 22;
+    private static final int SIZE = 23;
     boolean[] vol = new boolean[SIZE * SIZE * SIZE * SIZE];
+    int[] min = new int[4], max = new int[4];
 
     @Override
     public String testInput() {
@@ -26,18 +27,22 @@ public class Day17_ConwayCubes extends Base {
 
     @Override
     public void parse(String text) {
+        Arrays.fill(min, SIZE);
+        Arrays.fill(max, -1);
         var in = SUtils.lines(text);
         int y = 0;
         for (String line : in) {
-            int off = SIZE / 2 - line.length() / 2;
+            int off = SIZE / 2 - line.length() / 2 + 1;
             for (int x = 0; x < line.length(); x++) {
                 if ('#' == line.charAt(x)) {
-                    set(x + off, y + off, off, off, true);
+                    set(x + off, y + off, SIZE/2, SIZE/2, true);
+                    updateRanges(x + off, y + off, SIZE/2, SIZE/2);
                 }
             }
             y++;
         }
     }
+
 
     @Override
     public Long part2() {
@@ -50,10 +55,13 @@ public class Day17_ConwayCubes extends Base {
     private void iterate() {
         boolean[] old = Arrays.copyOf(vol, vol.length);
 
-        for (int w = 1; w < SIZE - 1; w++) {
-            for (int z = 1; z < SIZE - 1; z++) {
-                for (int y = 1; y < SIZE - 1; y++) {
-                    for (int x = 1; x < SIZE - 1; x++) {
+        int[] dmin = Arrays.copyOf(min, min.length);
+        int[] dmax = Arrays.copyOf(max, max.length);
+
+        for (int w = dmin[3]-1; w <= dmax[3]+1; w++) {
+            for (int z = dmin[2]-1; z <= dmax[2]+1; z++) {
+                for (int y = dmin[1]-1; y <= dmax[1]+1; y++) {
+                    for (int x = dmin[0]-1; x <= dmax[0]+1; x++) {
                         int count = countAround(old, x, y, z, w);
                         if (at(x, y, z, w)) {
                             if (count < 2 || count > 3) {
@@ -61,6 +69,7 @@ public class Day17_ConwayCubes extends Base {
                             }
                         } else {
                             if (count == 3) {
+                                updateRanges(x, y, z, w);
                                 set(x, y, z, w, true);
                             }
                         }
@@ -89,6 +98,16 @@ public class Day17_ConwayCubes extends Base {
         return count;
     }
 
+    private void updateRanges(int... vv) {
+        assert vv.length == 4;
+        for (int i = 0; i < vv.length; i++) {
+            if (vv[i] < min[i]) min[i] = vv[i];
+            if (vv[i] > max[i]) max[i] = vv[i];
+            if (min[i] < 2 || max[i] >= SIZE-2) {
+                throw new IllegalStateException("OoB");
+            }
+        }
+    }
     private boolean at(int x, int y, int z, int w) {
         return vol[index(x, y, z, w)];
     }
