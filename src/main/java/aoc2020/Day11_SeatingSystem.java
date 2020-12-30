@@ -19,7 +19,7 @@ public class Day11_SeatingSystem extends Base {
     int width, len;
     int[] grid;
     int[] prev;
-    int[][] visible;
+    int[] visible;
 
     @Override
     public void parse(Input input) {
@@ -27,7 +27,7 @@ public class Day11_SeatingSystem extends Base {
 
         len = in.size();
         width = in.get(0).length();
-        grid = new int[in.size() * width];
+        grid = new int[len * width + 1];
         int n = 0;
         for (String string : in) {
             for (int i = 0; i < string.length(); i++) {
@@ -41,9 +41,9 @@ public class Day11_SeatingSystem extends Base {
         int found = 0;
         prev = Arrays.copyOf(grid, grid.length);
 
-        visible = new int[grid.length][];
-        for (int i = 0; i < grid.length; i++) {
-            visible[i] = findVisibleSeatIndexes(i % width, i / width);
+        visible = new int[len * width * 8];
+        for (int i = 0; i < len * width; i++) {
+            findVisibleSeatIndexes(visible, i % width, i / width);
         }
 
         do {
@@ -53,12 +53,12 @@ public class Day11_SeatingSystem extends Base {
         return found;
     }
 
-    int[] findVisibleSeatIndexes(int x, int y) {
+    void findVisibleSeatIndexes(int[] vis, int x, int y) {
         int c = at(x,y);
         if (c == FLOOR) {
-            return null;
+            return; // Irrelevant - the corresponding range in vis will never be read
         }
-        int[] results = new int[8];
+        int start = (y * width + x) * 8;
         int i = 0;
         for (int dy = -1; dy < 2; dy++) {
             for (int dx = -1; dx < 2; dx++) {
@@ -67,7 +67,7 @@ public class Day11_SeatingSystem extends Base {
                         int ch = at(x+dx*m, y+dy*m);
                         if (ch != FLOOR) {
                             if (ch != WALL) {
-                                results[i++] = (y+dy*m) * width + x+dx*m;
+                                vis[start + (i++)] = (y+dy*m) * width + x+dx*m;
                             }
                             break;
                         }
@@ -75,12 +75,14 @@ public class Day11_SeatingSystem extends Base {
                 }
             }
         }
-        return i == 8 ? results : Arrays.copyOf(results, i);
+        while (i < 8) {
+            vis[start + (i++)] = width * len;
+        }
     }
 
     int iterate() {
         int count = 0;
-        for (int i = 0; i < prev.length; i++) {
+        for (int i = 0; i < prev.length - 1; i++) {
             switch (prev[i]) {
                 case TAKEN -> { checkLeave(i); count++; }
                 case EMPTY -> checkTake(i);
@@ -103,9 +105,10 @@ public class Day11_SeatingSystem extends Base {
         }
     }
 
-    private int sumVisible(int i) {
+    private int sumVisible(int from) {
         int sum = 0;
-        for (int seat : visible[i]) {
+        for (int i = 0; i < 8; ++i) {
+            int seat = visible[from * 8 + i];
             sum += prev[seat];
         }
         return sum;
