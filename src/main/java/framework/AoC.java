@@ -6,12 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
@@ -22,6 +20,14 @@ public class AoC {
     public static void main(String[] args) {
         new AoC().run();
     }
+
+    private static final int REPETITIONS = 5;
+    private static final long MIN_WARMUP_TIME_MS = 300;
+
+    private static final Function<List<Long>, String> PRINT_LAST = longs -> {
+            long v = longs.get(longs.size() - 1);
+            return v == 0 ? "-" : String.format("%8.2f", v / 1000000f);
+    };
 
     record DayStats(
             List<Long> total,
@@ -40,33 +46,50 @@ public class AoC {
         }
     }
 
+    private final Map<String, DayStats> measurements = new TreeMap<>();
+
     private void run() {
         List<Class<? extends Base>> classes = findClasses();
-        Map<String, DayStats> measurements = new TreeMap<>();
-        measure(measurements, classes);
-        System.out.println(formatTable(measurements, PRINT_LAST));
-        for (int i = 0; i < 5; i++) {
-            warmUp(classes, 10);
+        measure(classes);
+        System.out.println(formatTable(PRINT_LAST));
+        for (int i = 0; i < REPETITIONS; i++) {
+            warmUp(classes);
             System.out.println("\n=== Run " + (i+1) + " ===");
             System.gc();
-            measure(measurements, classes);
-            System.out.println(formatTable(measurements, PRINT_LAST));
+            measure(classes);
+
+            // TODO: Rather than printing out each repetition, print a summary with variance/range
+            System.out.println(formatTable(PRINT_LAST));
         }
     }
 
-    private void measure(Map<String, DayStats> measurements, List<Class<? extends Base>> classes) {
+    private void warmUp(List<Class<? extends Base>> classes) {
+        long t0 = System.nanoTime();
+        classes.parallelStream().forEach(this::warmup);
+        System.out.format("Time in warmUp: %.2f ms\n", (System.nanoTime() - t0) / 1_000_000f);
+    }
+
+    private void warmup(Class<? extends Base> c) {
+        long t0 = System.nanoTime();
+        do {
+            invokeDefaultConstructor(c).go();
+        } while (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0) < MIN_WARMUP_TIME_MS);
+    }
+
+    private void measure(List<Class<? extends Base>> classes) {
         for (Class<? extends Base> c : classes) {
             DayStats ds = measurements.computeIfAbsent(prettyNameFor(c), n -> new DayStats());
             long t0 = System.nanoTime();
             Base b = invokeDefaultConstructor(c);
-            if (b == null) continue;
-            b.parse(b.input());
-            long t1 = System.nanoTime();
-            Object p1 = b.part1();
-            long t2 = System.nanoTime();
-            Object p2 = b.part2();
-            long t3 = System.nanoTime();
-            ds.record(t1-t0, p1 == null ? 0L : t2-t1, p2 == null ? 0L : t3-t2);
+            if (b != null) {
+                b.parse(b.input());
+                long t1 = System.nanoTime();
+                Object p1 = b.part1();
+                long t2 = System.nanoTime();
+                Object p2 = b.part2();
+                long t3 = System.nanoTime();
+                ds.record(t1-t0, p1 == null ? 0L : t2-t1, p2 == null ? 0L : t3-t2);
+            }
         }
     }
 
@@ -88,15 +111,7 @@ public class AoC {
         return sb.toString();
     }
 
-    private static final Function<List<Long>, String> PRINT_LAST = longs -> {
-            long v = longs.get(longs.size() - 1);
-            return v == 0 ? "-" : String.format("%8.2f", v / 1000000f);
-    };
-
-
-    private String formatTable(
-            Map<String, DayStats> measurements,
-            Function<List<Long>, String> formatter) {
+    private String formatTable(Function<List<Long>, String> formatter) {
         List<List<String>> rows = new ArrayList<>();
         for (Entry<String, DayStats> entry : measurements.entrySet()) {
             DayStats ds = entry.getValue();
@@ -110,22 +125,6 @@ public class AoC {
         return TableFormatter.format(
                 List.of("Name   ", " Total", " Parsing", " Part 1", " Part 2"),
                 rows);
-    }
-
-    private void warmUp(List<Class<? extends Base>> classes, int count) {
-        long t0 = System.nanoTime();
-        createAll(classes, count)
-            .parallelStream()
-            .forEach(Base::go);
-        long t1 = System.nanoTime();
-        System.out.format("Time in warmUp: %.2f ms\n", (t1 - t0) / 1000000f);
-    }
-
-    private List<? extends Base> createAll(List<Class<? extends Base>> classes, int repititions) {
-        return classes.stream()
-                .flatMap(c -> Stream.generate(() -> invokeDefaultConstructor(c)).limit(repititions))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
     }
 
     private Base invokeDefaultConstructor(Class<? extends Base> c) {
