@@ -42,11 +42,11 @@ public class Day15_RambunctiousRecitation extends Base {
         }
         int speek = in[in.length - 1];
         history[speek] = 0;
+        bs.set(speek, false);
 
         for ( ; turn < numTurns; turn++) {
             int spoken = speek;
-            int prev = bs.get(spoken) ? history[spoken] : 0;
-            speek = (prev == 0) ? 0 : (turn - prev);
+            speek = bs.get(spoken) ? turn - history[spoken] : 0;
             history[spoken] = turn;
             bs.set(spoken);
         }

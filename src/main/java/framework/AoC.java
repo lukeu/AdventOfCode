@@ -56,10 +56,13 @@ public class AoC {
             warmUp(classes);
             System.out.println("\n=== Run " + (i+1) + " ===");
             System.gc();
+            long t0 = System.nanoTime();
             measure(classes);
+            long t1 = System.nanoTime();
 
             // TODO: Rather than printing out each repetition, print a summary with variance/range
             System.out.println(formatTable(PRINT_LAST));
+            System.out.format("TOTAL: %.2f ms\n", (t1 - t0) / 1000000f);
         }
     }
 
