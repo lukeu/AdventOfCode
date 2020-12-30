@@ -91,25 +91,24 @@ public class Day11_SeatingSystem extends Base {
 
     /** prev[i] is 'L'. See if grid[i] should be set to '#' */
     void checkTake(int i) {
-        for (int seat : visible[i]) {
-            if (prev[seat] == TAKEN) {
-                return;
-            }
+        if (sumVisible(i) < 100) {
+            grid[i] = TAKEN;
         }
-        grid[i] = TAKEN;
     }
 
     /** prev[i] is '#'. See if grid[i] should be set to 'L' */
     void checkLeave(int i) {
-
-        // NB: this could be a 1-liner using Streams, but this compiles to faster code
-        int occupied = 0;
-        for (int seat : visible[i]) {
-            occupied += prev[seat];
-        }
-        if (occupied >= 500) {
+        if (sumVisible(i) >= 500) {
             grid[i] = EMPTY;
         }
+    }
+
+    private int sumVisible(int i) {
+        int sum = 0;
+        for (int seat : visible[i]) {
+            sum += prev[seat];
+        }
+        return sum;
     }
 
     private int at(int x, int y) {
