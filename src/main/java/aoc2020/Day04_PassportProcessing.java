@@ -14,6 +14,7 @@ import com.google.common.primitives.Ints;
 import framework.AocMeta;
 import framework.Base;
 import framework.Input;
+import util.SUtils;
 
 @AocMeta(notes = "input validation")
 public class Day04_PassportProcessing extends Base {
@@ -45,9 +46,8 @@ public class Day04_PassportProcessing extends Base {
                 passports.add(m);
                 m = new HashMap<>();
             } else {
-                for (String field : line.split(" ")) {
-                    int c = field.indexOf(':');
-                    m.put(field.substring(0, c), field.substring(c + 1));
+                for (var r : SUtils.findKeyValuePairs(line, ' ', ':')) {
+                    m.put(line.substring(r.start(), r.sep()), line.substring(r.sep() + 1, r.end()));
                 }
             }
         }

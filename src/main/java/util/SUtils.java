@@ -1,5 +1,6 @@
 package util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +29,28 @@ public class SUtils {
 
     public static long[] lineLongs(String in) {
         return lines(in).stream().mapToLong(Long::parseLong).toArray();
+    }
+
+    public record KVRange(int start, int sep, int end) {}
+
+    /**
+     * Splits text containing key:value pairs. Assumes 2 clean, single-character separators.
+     * (so probably NOT good for end-of-lines if they could be Windows)
+     * Intended for code optimisation - may not actually need to construct strings & maps
+     */
+    public static List<KVRange> findKeyValuePairs(String str, char chunkSep, char dictSep) {
+        List<KVRange> result = new ArrayList<>();
+        int start = 0;
+        while (start < str.length()) {
+            int end = str.indexOf(chunkSep, start);
+            if (end < 0) {
+                end = str.length();
+            }
+            int iSep = str.indexOf(dictSep, start);
+            result.add(new KVRange(start, iSep, end));
+            start = end + 1;
+        }
+        return result;
     }
 
     public static List<int[]> readCommaInts(String in) {
