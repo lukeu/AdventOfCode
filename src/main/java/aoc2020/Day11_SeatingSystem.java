@@ -102,12 +102,10 @@ public class Day11_SeatingSystem extends Base {
 
     void iterate() {
         for (int y = 0; y < len; y++) {
-            int shift = Math.abs(len/2 - y);
-            int it = Math.max(blinds - shift, 0);
-            for (int x = it; x < width - it; x++) {
-                int i = y*width + x;
+            int it = Math.max(blinds - Math.abs(len/2 - y), 0);
+            for (int i = y*width + it; i < (y+1)*width - it; i++) {
                 switch (prev[i]) {
-                    case TAKEN -> { checkLeave(i); }
+                    case TAKEN -> checkLeave(i);
                     case EMPTY -> checkTake(i);
                 }
             }
@@ -129,6 +127,8 @@ public class Day11_SeatingSystem extends Base {
     }
 
     private int sumVisible(int from) {
+        // While this one-liner seems more elegant, it makes everything 10x slower! 2.6 -> 24 ms
+        // return Arrays.stream(visible, from*8, from*8 + 8).map(s -> prev[s]).sum();
         int sum = 0;
         for (int i = 0; i < 8; ++i) {
             int seat = visible[from * 8 + i];
