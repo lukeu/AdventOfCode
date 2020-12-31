@@ -47,23 +47,33 @@ public class Base {
         go();
     }
 
+    /** Just less quiet. */
+    public void setProfiling() {
+        profiling = true;
+    }
+
     public void go() {
         parse(input());
         printAndCheck("PART 1: ", expect1(), part1());
         printAndCheck("PART 2: ", expect2(), part2());
     }
 
-    private void printAndCheck(String heading, Object expected, Object got) {
-        if (m_quiet) {
-            return;
+    Object printAndCheck(String heading, Object expected, Object got) {
+        if (!m_quiet) {
+            if (!profiling) {
+                System.out.println(heading + got + (expected == null ? " (not checked)" : ""));
+            }
+            // Still check during daily profiling - this could catch stale state, or failing to re-parse
+            if (expected != null && !expected.equals(got)) {
+                if (profiling) {
+                    System.out.format(
+                            "Day %s %sgot %s -- EXPECTED %s\n", day(), heading, got, expected);
+                } else {
+                    System.out.println(" - EXPECTED " + expected);
+                }
+            }
         }
-        if (!profiling) {
-            System.out.println(heading + got + (expected == null ? " (not checked)" : ""));
-        }
-        // Still check during daily profiling - this could catch stale state, or failing to re-parse
-        if (expected != null && !expected.equals(got)) {
-            System.out.println(" - EXPECTED: " + expected);
-        }
+        return got;
     }
 
     public int year() {
@@ -92,7 +102,6 @@ public class Base {
     public Object testExpect2() {
         return null;
     }
-
 
     public Input input() {
         if (!profiling && !m_quiet) {

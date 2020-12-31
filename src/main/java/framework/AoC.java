@@ -50,14 +50,14 @@ public class AoC {
 
     private void run() {
         List<Class<? extends Base>> classes = findClasses();
-        measure(classes);
+        measure(classes, false);
         System.out.println(formatTable(PRINT_LAST));
         for (int i = 0; i < REPETITIONS; i++) {
             warmUp(classes);
             System.out.println("\n=== Run " + (i+1) + " ===");
             System.gc();
             long t0 = System.nanoTime();
-            measure(classes);
+            measure(classes, true);
             long t1 = System.nanoTime();
 
             // TODO: Rather than printing out each repetition, print a summary with variance/range
@@ -75,21 +75,28 @@ public class AoC {
     private void warmup(Class<? extends Base> c) {
         long t0 = System.nanoTime();
         do {
-            invokeDefaultConstructor(c).go();
+            Base b = invokeDefaultConstructor(c);
+            b.setQuiet();
+            b.go();
         } while (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0) < MIN_WARMUP_TIME_MS);
     }
 
-    private void measure(List<Class<? extends Base>> classes) {
+    private void measure(List<Class<? extends Base>> classes, boolean quiet) {
         for (Class<? extends Base> c : classes) {
             DayStats ds = measurements.computeIfAbsent(prettyNameFor(c), n -> new DayStats());
             long t0 = System.nanoTime();
             Base b = invokeDefaultConstructor(c);
+            if (quiet) {
+                b.setQuiet();
+            } else {
+                b.setProfiling();
+            }
             if (b != null) {
                 b.parse(b.input());
                 long t1 = System.nanoTime();
-                Object p1 = b.part1();
+                Object p1 = b.printAndCheck("PART 1: ", b.expect1(), b.part1());
                 long t2 = System.nanoTime();
-                Object p2 = b.part2();
+                Object p2 = b.printAndCheck("PART 1: ", b.expect2(), b.part2());
                 long t3 = System.nanoTime();
                 ds.record(t1-t0, p1 == null ? 0L : t2-t1, p2 == null ? 0L : t3-t2);
             }
@@ -132,9 +139,7 @@ public class AoC {
 
     private Base invokeDefaultConstructor(Class<? extends Base> c) {
         try {
-            Base b = c.getConstructor().newInstance();
-            b.setQuiet();
-            return b;
+            return c.getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             e.printStackTrace();
