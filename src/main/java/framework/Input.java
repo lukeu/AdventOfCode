@@ -1,11 +1,15 @@
 package framework;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -110,6 +114,16 @@ public class Input {
     }
 
     private static InputStream newStream(int year, int day) {
+
+        // TODO: generalise (e.g. multiple directories of test data)
+        File f = Path.of("src/main/resources").resolve(resourceName(year, day)).toFile();
+        try {
+            if (f.exists()) {
+                return new FileInputStream(f);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         return Input.class.getClassLoader().getResourceAsStream(resourceName(year, day));
     }
 
