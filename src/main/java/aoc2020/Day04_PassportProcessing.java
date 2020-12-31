@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
@@ -70,6 +71,8 @@ public class Day04_PassportProcessing extends Base {
     }
 
     Set<String> colours = Set.of("amb","blu","brn","gry","grn","hzl","oth");
+    Pattern hair = Pattern.compile("\\#[0-9a-f]{6}");
+    Pattern id = Pattern.compile("[0-9]{9}");
 
     // Not aiming for clean code, but things I should have thought of for speed
     private boolean checkFields(Map<String, String> m) {
@@ -86,9 +89,9 @@ public class Day04_PassportProcessing extends Base {
                 case "iyr" -> i != null && i >= 2010 && i <= 2020;
                 case "eyr" -> i != null && i >= 2020 && i <= 2030;
                 case "hgt" -> checkHeight(v);
-                case "hcl" -> v.matches("\\#[0-9a-f]{6}");
+                case "hcl" -> hair.matcher(v).matches();
                 case "ecl" -> colours.contains(v);
-                case "pid" -> v.matches("[0-9]{9}");
+                case "pid" -> id.matcher(v).matches();
                 default -> true;
             };
             if (!ok) return false;
