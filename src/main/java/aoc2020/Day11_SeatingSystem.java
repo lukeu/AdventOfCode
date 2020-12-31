@@ -34,6 +34,7 @@ public class Day11_SeatingSystem extends Base {
     int[] grid;
     int[] prev;
     int[] visible;
+    int blinds;
 
     @Override
     public void parse(Input input) {
@@ -42,6 +43,7 @@ public class Day11_SeatingSystem extends Base {
         len = in.size();
         width = in.get(0).length();
         grid = new int[len * width + 1];
+        blinds = -4;
         int n = 0;
         for (String string : in) {
             for (int i = 0; i < string.length(); i++) {
@@ -62,6 +64,7 @@ public class Day11_SeatingSystem extends Base {
         do {
             prev = Arrays.copyOf(grid, grid.length);
             iterate();
+            ++ blinds;
         } while (!Arrays.equals(prev, grid));
         return Arrays.stream(grid).sum() / TAKEN;
     }
@@ -94,10 +97,15 @@ public class Day11_SeatingSystem extends Base {
     }
 
     void iterate() {
-        for (int i = 0; i < prev.length - 1; i++) {
-            switch (prev[i]) {
-                case TAKEN -> { checkLeave(i); }
-                case EMPTY -> checkTake(i);
+        for (int y = 0; y < len; y++) {
+            int shift = Math.abs(len/2 - y);
+            int it = Math.max(blinds - shift, 0);
+            for (int x = it; x < width - it; x++) {
+                int i = y*width + x;
+                switch (prev[i]) {
+                    case TAKEN -> { checkLeave(i); }
+                    case EMPTY -> checkTake(i);
+                }
             }
         }
     }
