@@ -28,7 +28,7 @@ public class Day11_SeatingSystem extends Base {
     @Override public Object testExpect2() { return 26; }
     @Override public Object expect2() { return 2131; }
 
-    private static final int EMPTY = 0, FLOOR = 1, WALL = 2, TAKEN = 100;
+    private static final int EMPTY = 0, FLOOR = 1, WALL = 2, TAKEN = 100_000;
 
     int width, len;
     int[] grid;
@@ -52,7 +52,6 @@ public class Day11_SeatingSystem extends Base {
 
     @Override
     public Integer part2() {
-        int found = 0;
         prev = Arrays.copyOf(grid, grid.length);
 
         visible = new int[len * width * 8];
@@ -62,9 +61,9 @@ public class Day11_SeatingSystem extends Base {
 
         do {
             prev = Arrays.copyOf(grid, grid.length);
-            found = iterate();
+            iterate();
         } while (!Arrays.equals(prev, grid));
-        return found;
+        return Arrays.stream(grid).sum() / TAKEN;
     }
 
     void findVisibleSeatIndexes(int[] vis, int x, int y) {
@@ -94,27 +93,25 @@ public class Day11_SeatingSystem extends Base {
         }
     }
 
-    int iterate() {
-        int count = 0;
+    void iterate() {
         for (int i = 0; i < prev.length - 1; i++) {
             switch (prev[i]) {
-                case TAKEN -> { checkLeave(i); count++; }
+                case TAKEN -> { checkLeave(i); }
                 case EMPTY -> checkTake(i);
             }
         }
-        return count;
     }
 
     /** prev[i] is 'L'. See if grid[i] should be set to '#' */
     void checkTake(int i) {
-        if (sumVisible(i) < 100) {
+        if (sumVisible(i) < TAKEN) {
             grid[i] = TAKEN;
         }
     }
 
     /** prev[i] is '#'. See if grid[i] should be set to 'L' */
     void checkLeave(int i) {
-        if (sumVisible(i) >= 500) {
+        if (sumVisible(i) >= (5*TAKEN)) {
             grid[i] = EMPTY;
         }
     }
