@@ -38,12 +38,19 @@ public class Day04_PassportProcessing extends Base {
 
     @Override
     public void parse(Input input) {
-        for (String s : input.blocks()) {
-            var m = new HashMap<String, String>();
-            for (String field : s.split("\\s+")) {
-                var f = field.split(":");
-                m.put(f[0], f[1]);
+        var m = new HashMap<String, String>();
+        for (String line : input.lines()) {
+            if (line.isEmpty()) {
+                passports.add(m);
+                m = new HashMap<>();
+            } else {
+                for (String field : line.split(" ")) {
+                    int c = field.indexOf(':');
+                    m.put(field.substring(0, c), field.substring(c + 1));
+                }
             }
+        }
+        if (!m.isEmpty()) {
             passports.add(m);
         }
     }

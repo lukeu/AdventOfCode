@@ -43,7 +43,7 @@ public class Input {
     }
 
     public List<String> lines() {
-        return withReader(r -> r.lines().filter(s -> !s.isEmpty()).collect(Collectors.toList()));
+        return withReader(r -> r.lines().collect(Collectors.toList()));
     }
 
     public int[] lineInts() {
