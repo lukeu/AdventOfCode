@@ -134,4 +134,19 @@ public class Day11_SeatingSystem extends Base {
         }
         return prev[y*width + x];
     }
+
+    String print() {
+        var sb = new StringBuilder();
+        for (int i = 0; i < grid.length; i++) {
+            if (i > 0 && i % width == 0) {
+                sb.append('\n');
+            }
+            sb.append(switch (grid[i]) {
+                case EMPTY -> 'L';
+                case TAKEN -> '#';
+                default -> '.';
+            });
+        }
+        return sb.toString();
+    }
 }
