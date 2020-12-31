@@ -61,11 +61,15 @@ public class Day11_SeatingSystem extends Base {
             findVisibleSeatIndexes(visible, i % width, i / width);
         }
 
+        int fixed;
         do {
-            prev = Arrays.copyOf(grid, grid.length);
+            fixed = Math.max(0, blinds - len/2 + 4) * width;
+            System.arraycopy(grid, fixed, prev, fixed, grid.length - fixed*2);
             iterate();
             ++ blinds;
-        } while (!Arrays.equals(prev, grid));
+        } while (!Arrays.equals(
+                prev, fixed, grid.length - fixed * 2,
+                grid, fixed, grid.length - fixed * 2));
         return Arrays.stream(grid).sum() / TAKEN;
     }
 
