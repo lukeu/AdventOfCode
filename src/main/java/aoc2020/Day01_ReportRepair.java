@@ -9,6 +9,7 @@ public class Day01_ReportRepair extends Base {
         Base.run(Day01_ReportRepair::new, 1);
     }
 
+    @Override public Object expect1() { return 32064; }
     @Override public Object expect2() { return 193598720; }
 
     int[] in;
@@ -16,6 +17,18 @@ public class Day01_ReportRepair extends Base {
     @Override
     public void parse(Input input) {
         in = input.lineInts();
+    }
+
+    @Override
+    public Object part1() {
+        for (int a : in) {
+            for (int b : in) {
+                if (a + b == 2020) {
+                    return a * b;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
