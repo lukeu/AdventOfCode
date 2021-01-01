@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -105,7 +106,15 @@ public class Input {
         });
     }
 
-    private <T> T withReader(Function<BufferedReader, T> fn) {
+    public void withReaderDo(Consumer<BufferedReader> doer) {
+        try (var br = supplier.get()) {
+            doer.accept(br);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public <T> T withReader(Function<BufferedReader, T> fn) {
         try (var br = supplier.get()) {
             return fn.apply(br);
         } catch (IOException e) {
