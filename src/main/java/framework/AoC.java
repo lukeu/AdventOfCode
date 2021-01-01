@@ -69,7 +69,7 @@ public class AoC {
     private void warmUp(List<Class<? extends Base>> classes) {
         long t0 = System.nanoTime();
         classes.parallelStream().forEach(this::warmup);
-        System.out.format("Time in warmUp: %.2f ms\n", (System.nanoTime() - t0) / 1_000_000f);
+        System.out.format("\nWarm-up wall time: %.2f ms\n", (System.nanoTime() - t0) / 1_000_000f);
     }
 
     private void warmup(Class<? extends Base> c) {
@@ -109,16 +109,15 @@ public class AoC {
         if (under < 0) {
             return "Day " + name.substring(3);
         }
-        var caps = Pattern.compile("[A-Z]");
-        var sb = new StringBuilder();
-        sb.append("Day ");
-        sb.append(name.substring(3, under));
-        sb.append(caps.matcher(name.substring(under + 1)).replaceAll(" $0"));
+        return "Day "
+                + name.substring(3, under)
+                + name.substring(under + 1).replaceAll("[A-Z]", " $0")
+                + getNotes(c);
+    }
+
+    private String getNotes(Class<?> c) {
         AocMeta meta = c.getAnnotation(AocMeta.class);
-        if (meta != null && meta.notes() != null) {
-            sb.append(" (").append(meta.notes()).append(')');
-        }
-        return sb.toString();
+        return (meta == null || meta.notes() == null) ? "" : " (" + meta.notes() + ')';
     }
 
     private String formatTable(Function<List<Long>, String> formatter) {
@@ -179,7 +178,6 @@ public class AoC {
         } catch (IOException ex) {
             throw new AssertionError(ex);
         }
-        var classes = cp.getTopLevelClasses(pkg);
-        return classes;
+        return cp.getTopLevelClasses(pkg);
     }
 }
