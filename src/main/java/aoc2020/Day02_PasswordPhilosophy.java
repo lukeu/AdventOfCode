@@ -35,16 +35,20 @@ public class Day02_PasswordPhilosophy extends Base {
         for (String s : input.lines()) {
             int i = s.indexOf('-');
             int j = s.indexOf(':');
-            int min = Integer.parseInt(s.substring(0, i));
-            int max = Integer.parseInt(s.substring(i+1, j-2));
+            int min = Integer.parseInt(s, 0, i, 10);
+            int max = Integer.parseInt(s, i+1, j-2, 10);
             char ch = s.charAt(j-1);
-            String str = s.substring(j+2);
 
-            int count = (int) str.chars().filter(c -> c == ch).count();
+            int count = 0;
+            for (int k = j+2; k < s.length(); k++) {
+                if (s.charAt(k) == ch) {
+                    count++;
+                }
+            }
             if (count >= min && count <= max) {
                 part1 ++;
             }
-            if (str.charAt(min-1) == ch ^ str.charAt(max-1) == ch) {
+            if (s.charAt(min + j + 1) == ch ^ s.charAt(max + j + 1) == ch) {
                 part2 ++;
             }
         }
