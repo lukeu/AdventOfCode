@@ -27,7 +27,7 @@ public class AoC {
 
     private static final Function<List<Long>, String> PRINT_LAST = longs -> {
             long v = longs.get(longs.size() - 1);
-            return v == 0 ? "-" : String.format("%8.2f", v / 1000000f);
+            return v == 0 ? "-" : String.format("%,8.0f", v / 1000f);
     };
 
     record DayStats(
@@ -65,7 +65,7 @@ public class AoC {
 
             // TODO: Rather than printing out each repetition, print a summary with variance/range
             System.out.println(formatTable(PRINT_LAST));
-            System.out.format("TOTAL: %.2f ms\n", (t1 - t0) / 1000000f);
+            System.out.format("TOTAL: %,.0f μs\n", (t1 - t0) / 1000f);
         }
     }
 
@@ -155,7 +155,7 @@ public class AoC {
                     formatter.apply(ds.part2)));
         }
         return TableFormatter.format(
-                List.of("Name   ", " Total", " Parsing", " Part 1", " Part 2"),
+                List.of("Name   ", " Total μs", " Parsing", " Part 1", " Part 2"),
                 rows);
     }
 
