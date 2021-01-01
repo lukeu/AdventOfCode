@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.collect.ImmutableSet;
@@ -50,6 +51,8 @@ public class AoC {
 
     private void run() {
         List<Class<? extends Base>> classes = findClasses();
+
+        preload();
         measure(classes, false);
         System.out.println(formatTable(PRINT_LAST));
         for (int i = 0; i < REPETITIONS; i++) {
@@ -64,6 +67,26 @@ public class AoC {
             System.out.println(formatTable(PRINT_LAST));
             System.out.format("TOTAL: %.2f ms\n", (t1 - t0) / 1000000f);
         }
+    }
+
+    private void preload() {
+        int year = 2020; // TODO: generalise!
+        String pkg = "aoc" + year;
+        Pattern pattern = Pattern.compile(pkg + "\\.Day(\\d+).+");
+
+        long t0 = System.nanoTime();
+        int count = 0;
+        for (var info : getClassesInPackage(pkg)) {
+            Matcher m = pattern.matcher(info.getName());
+            if (m.matches()) {
+                if (Input.preload(year, Integer.parseInt(m.group(1)))) {
+                    count ++;
+                }
+            }
+        }
+
+        long t1 = System.nanoTime();
+        System.out.format("Preloaded %d inputs in: %.0f ms\n", count, (t1 - t0) / 1000000f);
     }
 
     private void warmUp(List<Class<? extends Base>> classes) {
@@ -148,7 +171,7 @@ public class AoC {
 
     private List<Class<? extends Base>> findClasses() {
         String pkg = "aoc2020"; // TODO: generalise!
-        Pattern pattern = Pattern.compile(pkg + "\\.Day\\d.+");
+        Pattern pattern = Pattern.compile(pkg + "\\.Day(\\d+).+");
 
         List<Class<? extends Base>> result = new ArrayList<>();
         for (var info : getClassesInPackage(pkg)) {

@@ -24,6 +24,8 @@ public class Base {
         }
     }
 
+    private final int day = Integer.parseInt(getClass().getSimpleName().substring(3,5));
+
     /** Used by the AoC bulk-runner. */
     private boolean m_quiet = false;
 
@@ -42,6 +44,7 @@ public class Base {
     }
 
     private boolean profiling = false;
+
     void profile() {
         profiling = true;
         go();
@@ -77,11 +80,11 @@ public class Base {
     }
 
     public int year() {
-        return 2020;
+        return 2020; // TODO
     }
 
     public int day() {
-        return Integer.parseInt(getClass().getSimpleName().substring(3,5));
+        return day;
     }
 
     public void parse(Input input) {

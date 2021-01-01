@@ -1,6 +1,8 @@
 package framework;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,7 +13,9 @@ import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -30,7 +34,7 @@ public class Input {
         this(() -> newReader(newStream(year, day)));
     }
 
-    public Input(String text) {
+    Input(String text) {
         this(() -> new BufferedReader(new StringReader(text)));
     }
 
@@ -114,6 +118,10 @@ public class Input {
     }
 
     private static InputStream newStream(int year, int day) {
+        byte[] cached = preloadCache.get(cacheKey(year, day));
+        if (cached != null) {
+            return new ByteArrayInputStream(cached);
+        }
 
         // TODO: generalise (e.g. multiple directories of test data)
         File f = Path.of("src/main/resources").resolve(resourceName(year, day)).toFile();
@@ -124,10 +132,28 @@ public class Input {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
         return Input.class.getClassLoader().getResourceAsStream(resourceName(year, day));
     }
 
     public static String resourceName(int year, int day) {
         return String.format("%d/in_%02d.txt", year, day);
     }
+
+    private static Map<Integer, byte[]> preloadCache = new HashMap<>();
+
+    static boolean preload(int year, int day) {
+        try {
+            var bytes = new BufferedInputStream(newStream(year, day)).readAllBytes();
+            preloadCache.put(cacheKey(year, day), bytes);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private static int cacheKey(int year, int day) {
+        return year * 100 + day;
+    }
+
 }
