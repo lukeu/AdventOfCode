@@ -1,9 +1,9 @@
 package aoc2020;
 
-import java.util.List;
-
+import com.google.common.primitives.Bytes;
 import framework.Base;
 import framework.Input;
+import util.ByteBiter;
 
 public class Day03_TobogganTrajectory extends Base {
     public static void main(String[] args) {
@@ -13,13 +13,31 @@ public class Day03_TobogganTrajectory extends Base {
     @Override public Object expect1() { return 240L; }
     @Override public Object expect2() { return 2832009600L; }
 
-    List<String> in;
+    long[] rows;
     int w;
 
     @Override
     public void parse(Input input) {
-        in = input.lines();
-        w = in.get(0).length();
+        var bb = new ByteBiter(input.bytes(this));
+        w = Bytes.indexOf(bb.bytes, (byte) '\n');
+        rows = new long[(bb.bytes.length + 1) / (w+1)]; // 1st +1 in case no \n @ EOF, 2nd for EOLs
+        int r = 0;
+        while (bb.hasRemaining()) {
+            rows[r++] = readRow(bb);
+            if (bb.hasRemaining()) {
+                bb.get();
+            }
+        }
+    }
+
+    private long readRow(ByteBiter bb) {
+        long acc = 0;
+        for (int i = 0; i < w; i++) {
+            byte b = bb.get();
+            int v = (b - ((byte) '.')) >>> 31; // seems a ~tiny~ bit faster than a ternary
+            acc = (acc << 1) + v;
+        }
+        return acc;
     }
 
     @Override
@@ -37,15 +55,22 @@ public class Day03_TobogganTrajectory extends Base {
     }
 
     private long slopeHits(int dy, int dx) {
-        int x = 0;
+        int x = w-1;
         int found = 0;
-        for (int r = 0; r < in.size(); r += dy) {
-            String s = in.get(r);
-            if (s.charAt(x % w) == '#') {
+        for (int r = 0; r < rows.length; r += dy) {
+            var bs = rows[r];
+            if (isBitSet(bs, x)) {
                 found++;
             }
-            x += dx;
+            x -= dx;
+            if (x < 0) { // branch quicker than %?
+                x += w;
+            }
         }
         return found;
+    }
+
+    private boolean isBitSet(long value, int bit) {
+        return (value & (1L << bit)) != 0;
     }
 }
