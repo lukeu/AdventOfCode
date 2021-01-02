@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,17 +31,16 @@ import com.google.common.primitives.Ints;
 public class Input {
 
     private final Supplier<BufferedReader> supplier;
+    private final boolean isText;
 
     Input(int year, int day) {
-        this(() -> newReader(newStream(year, day)));
+        this.supplier = () -> newReader(newStream(year, day));
+        isText = false;
     }
 
     Input(String text) {
-        this(() -> new BufferedReader(new StringReader(text)));
-    }
-
-    Input(Supplier<BufferedReader> supplier) {
-        this.supplier = supplier;
+        this.supplier = () -> new BufferedReader(new StringReader(text));
+        isText = true;
     }
 
     public String text() {
@@ -121,6 +121,21 @@ public class Input {
             throw new UncheckedIOException(e);
         }
     }
+
+    public byte[] bytes(Base base) {
+        if (!isText) {
+            byte[] cached = preloadCache.get(cacheKey(base.year(), base.day()));
+            if (cached != null) {
+                return cached;
+            }
+        }
+        try {
+            return CharStreams.toString(supplier.get()).getBytes(StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
 
     private static BufferedReader newReader(InputStream is) {
         return new BufferedReader(new InputStreamReader(is));

@@ -1,5 +1,8 @@
 package aoc2020;
 
+import java.nio.ByteBuffer;
+import java.util.List;
+
 import framework.Base;
 import framework.Input;
 
@@ -32,23 +35,45 @@ public class Day02_PasswordPhilosophy extends Base {
 
     @Override
     public void parse(Input input) {
-        for (String s : input.lines()) {
-            int i = s.indexOf('-');
-            int j = s.indexOf(':');
-            int min = Integer.parseInt(s, 0, i, 10);
-            int max = Integer.parseInt(s, i+1, j-2, 10);
-            char ch = s.charAt(j-1);
+        byte[] bytes = input.bytes(this);
+        var bb = ByteBuffer.wrap(bytes);
+        while (bb.hasRemaining()) {
+            byte b;
+            int i;
+
+            i = bb.get();
+            while (i == '\n') {
+                if (bb.hasRemaining()) {
+                    i = bb.get();
+                } else {
+                    return;
+                }
+            }
+            i -= '0';
+            b = bb.get();
+            int min = (b == '-') ? i : i * 10 + b - '0' + bb.get() - '-';
+
+            i = bb.get() - '0';
+            b = bb.get();
+            int max = (b == ' ') ? i : i * 10 + b - '0' + bb.get() - ' ';
+
+            byte ch = bb.get();
+            int j = bb.position();
+            bb.get(); bb.get();
 
             int count = 0;
-            for (int k = j+2; k < s.length(); k++) {
-                if (s.charAt(k) == ch) {
+            for (int k = j+2; k < bytes.length; k++) {
+                byte bk = bb.get();
+                if (bk == ch) {
                     count++;
+                } else if (bk == '\n') { // will safely skip over '\r'
+                    break;
                 }
             }
             if (count >= min && count <= max) {
                 part1 ++;
             }
-            if (s.charAt(min + j + 1) == ch ^ s.charAt(max + j + 1) == ch) {
+            if (bytes[min + j + 1] == ch ^ bytes[max + j + 1] == ch) {
                 part2 ++;
             }
         }
