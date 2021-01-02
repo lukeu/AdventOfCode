@@ -1,10 +1,8 @@
 package aoc2020;
 
-import java.nio.ByteBuffer;
-import java.util.List;
-
 import framework.Base;
 import framework.Input;
+import util.ByteBiter;
 
 public class Day02_PasswordPhilosophy extends Base {
 
@@ -35,48 +33,38 @@ public class Day02_PasswordPhilosophy extends Base {
 
     @Override
     public void parse(Input input) {
-        byte[] bytes = input.bytes(this);
-        var bb = ByteBuffer.wrap(bytes);
+        var bb = new ByteBiter(input.bytes(this));
         while (bb.hasRemaining()) {
-            byte b;
-            int i;
-
-            i = bb.get();
-            while (i == '\n') {
-                if (bb.hasRemaining()) {
-                    i = bb.get();
-                } else {
-                    return;
-                }
-            }
-            i -= '0';
-            b = bb.get();
-            int min = (b == '-') ? i : i * 10 + b - '0' + bb.get() - '-';
-
-            i = bb.get() - '0';
-            b = bb.get();
-            int max = (b == ' ') ? i : i * 10 + b - '0' + bb.get() - ' ';
-
+            int min = bb.positiveInt();
+            bb.skip();
+            int max = bb.positiveInt();
+            bb.skip();
             byte ch = bb.get();
-            int j = bb.position();
-            bb.get(); bb.get();
+            int startChars = bb.pos + 1;
 
-            int count = 0;
-            for (int k = j+2; k < bytes.length; k++) {
-                byte bk = bb.get();
-                if (bk == ch) {
-                    count++;
-                } else if (bk == '\n') { // will safely skip over '\r'
-                    break;
-                }
-            }
-            if (count >= min && count <= max) {
+            if (scanLinePart1(bb, min, max, ch)) {
                 part1 ++;
             }
-            if (bytes[min + j + 1] == ch ^ bytes[max + j + 1] == ch) {
+            if (bb.bytes[min + startChars] == ch ^ bb.bytes[max + startChars] == ch) {
                 part2 ++;
             }
         }
+    }
+
+    /** Performs much faster than the 1-line Stream incantation. */
+    private boolean scanLinePart1(ByteBiter bb, int min, int max, int ch) {
+        int count = 0;
+        int k;
+        for (k = bb.pos + 2; k < bb.bytes.length; k++) {
+            byte bk = bb.bytes[k];
+            if (bk == ch) {
+                count++;
+            } else if (bk == '\n') { // will safely skip over '\r'
+                break;
+            }
+        }
+        bb.pos = k + 1;
+        return count >= min && count <= max;
     }
 
     @Override
