@@ -59,13 +59,11 @@ public class AoC {
             warmUp(classes);
             System.out.println("\n=== Run " + (i+1) + " ===");
             System.gc();
-            long t0 = System.nanoTime();
-            measure(classes, true);
-            long t1 = System.nanoTime();
+            long total = measure(classes, true);
 
             // TODO: Rather than printing out each repetition, print a summary with variance/range
             System.out.println(formatTable(PRINT_LAST));
-            System.out.format("TOTAL: %,.0f μs\n", (t1 - t0) / 1000f);
+            System.out.format("TOTAL: %,.0f μs\n", total / 1000f);
         }
     }
 
@@ -104,17 +102,18 @@ public class AoC {
         } while (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0) < MIN_WARMUP_TIME_MS);
     }
 
-    private void measure(List<Class<? extends Base>> classes, boolean quiet) {
+    private long measure(List<Class<? extends Base>> classes, boolean quiet) {
+        long total = 0;
         for (Class<? extends Base> c : classes) {
             DayStats ds = measurements.computeIfAbsent(prettyNameFor(c), n -> new DayStats());
             long t0 = System.nanoTime();
             Base b = invokeDefaultConstructor(c);
-            if (quiet) {
-                b.setQuiet();
-            } else {
-                b.setProfiling();
-            }
             if (b != null) {
+                if (quiet) {
+                    b.setQuiet();
+                } else {
+                    b.setProfiling();
+                }
                 b.parse(b.input());
                 long t1 = System.nanoTime();
                 Object p1 = b.printAndCheck("PART 1: ", b.expect1(), b.part1());
@@ -122,8 +121,10 @@ public class AoC {
                 Object p2 = b.printAndCheck("PART 1: ", b.expect2(), b.part2());
                 long t3 = System.nanoTime();
                 ds.record(t1-t0, p1 == null ? 0L : t2-t1, p2 == null ? 0L : t3-t2);
+                total += (t3 - t0);
             }
         }
+        return total;
     }
 
     private String prettyNameFor(Class<?> c) {
