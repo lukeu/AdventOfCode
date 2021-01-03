@@ -20,17 +20,19 @@ public class Day04_PassportProcessing extends Base {
     @Override public Object expect1() { return 254; }
     @Override public Object expect2() { return 184; }
 
-    private List<String[]> passports = new ArrayList<>();
+    private List<Object[]> passports = new ArrayList<>();
 
     @Override
     public void parse(Input input) {
         boolean valid = true;
-        var pp = new String[8];
+        var pp = new Object[8];
         var bb = new ByteBiter(input.bytes(this));
         while (bb.hasRemaining()) {
             int key = bb.getBinaryInt();
-            String value = bb.extractToWhitespace();
             int index = index(key);
+            Object value = (index >= 0 && index <= 2)
+                    ? bb.positiveInt() // NB: nasty assumption about input made here
+                    : bb.extractToWhitespace();
             if (index >= 0) {
                 pp[index] = value;
             } else {
@@ -43,13 +45,13 @@ public class Day04_PassportProcessing extends Base {
                         addIfValid(pp);
                     }
                     valid = true;
-                    pp = new String[8];
+                    pp = new Object[8];
                 }
             }
         }
     }
 
-    private void addIfValid(String[] pp) {
+    private void addIfValid(Object[] pp) {
         for (int i = 0; i < 7; i++) {
             if (pp[i] == null) {
                 return;
@@ -92,17 +94,17 @@ public class Day04_PassportProcessing extends Base {
     Pattern hair = Pattern.compile("\\#[0-9a-f]{6}");
     Pattern id = Pattern.compile("[0-9]{9}");
 
-    private boolean checkFields(String[] pp) {
-        Integer b = Ints.tryParse(pp[0]);
-        Integer i = Ints.tryParse(pp[1]);
-        Integer e = Ints.tryParse(pp[2]);
-        return b != null && b >= 1920 && b <= 2002
-                && i != null && i >= 2010 && i <= 2020
-                && e != null && e >= 2020 && e <= 2030
-                && checkHeight(pp[3]) // 21 us
-                && hair.matcher(pp[4]).matches() // 47 us
+    private boolean checkFields(Object[] pp) {
+        int b = (Integer) pp[0];
+        int i = (Integer) pp[1];
+        int e = (Integer) pp[2];
+        return b >= 1920 && b <= 2002
+                && i >= 2010 && i <= 2020
+                && e >= 2020 && e <= 2030
+                && checkHeight((String) pp[3]) // 21 us
+                && hair.matcher((String) pp[4]).matches() // 47 us
                 && colours.contains(pp[5]) // 20 us
-                && id.matcher(pp[6]).matches() // 48 us
+                && id.matcher((String) pp[6]).matches() // 48 us
                 ;
     }
 
