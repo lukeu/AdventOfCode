@@ -23,21 +23,11 @@ public class Day03_TobogganTrajectory extends Base {
         rows = new long[(bb.bytes.length + 1) / (w+1)]; // 1st +1 in case no \n @ EOF, 2nd for EOLs
         int r = 0;
         while (bb.hasRemaining()) {
-            rows[r++] = readRow(bb);
+            rows[r++] = bb.readAsBinary((byte) '.', (byte) '#', w);
             if (bb.hasRemaining()) {
                 bb.get();
             }
         }
-    }
-
-    private long readRow(ByteBiter bb) {
-        long acc = 0;
-        for (int i = 0; i < w; i++) {
-            byte b = bb.get();
-            int v = (b - ((byte) '.')) >>> 31; // seems a ~tiny~ bit faster than a ternary
-            acc = (acc << 1) + v;
-        }
-        return acc;
     }
 
     @Override

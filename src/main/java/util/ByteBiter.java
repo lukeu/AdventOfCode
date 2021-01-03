@@ -40,4 +40,30 @@ public class ByteBiter {
     public void skip() {
         pos++;
     }
+
+    public long readAsBinary(byte zero, byte one, int num) {
+        return zero > one
+                ? readAsBinary0(zero, num)
+                : readAsBinary1(one, num);
+    }
+
+    private long readAsBinary0(byte zero, int num) {
+        long acc = 0;
+        for (int i = 0; i < num; i++) {
+            byte b = get();
+            int v = (b - zero) >>> 31; // Read the negative bit. A ~tiny~ bit faster than a ternary
+            acc = (acc << 1) + v;
+        }
+        return acc;
+    }
+
+    private long readAsBinary1(byte one, int num) {
+        long acc = 0;
+        for (int i = 0; i < num; i++) {
+            byte b = get();
+            int v = 1 - ((b - one) >>> 31); // Read the negative bit.
+            acc = (acc << 1) + v;
+        }
+        return acc;
+    }
 }
