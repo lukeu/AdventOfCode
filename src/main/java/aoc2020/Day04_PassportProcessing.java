@@ -1,20 +1,15 @@
 package aoc2020;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.google.common.collect.Sets;
-import com.google.common.collect.Sets.SetView;
 import com.google.common.primitives.Ints;
 import framework.AocMeta;
 import framework.Base;
 import framework.Input;
-import util.SUtils;
+import util.ByteBiter;
 
 @AocMeta(notes = "input validation")
 public class Day04_PassportProcessing extends Base {
@@ -22,81 +17,93 @@ public class Day04_PassportProcessing extends Base {
         Base.run(Day04_PassportProcessing::new, 1);
     }
 
-    @Override public Object expect1() { return 254L; }
-    @Override public Object expect2() { return 184L; }
+    @Override public Object expect1() { return 254; }
+    @Override public Object expect2() { return 184; }
 
-    Set<String> keys = Set.of(
-            "byr",//" (Birth Year)     
-            "iyr",//" (Issue Year)
-            "eyr",//" (Expiration Year)
-            "hgt",//" (Height)
-            "hcl",//" (Hair Color)
-            "ecl",//" (Eye Color)
-            "pid"//" (Passport ID)
-    //        "cid"//" (Country ID)
-    );
-
-    List<Map<String, String>> passports = new ArrayList<>();
+    private List<String[]> passports = new ArrayList<>();
 
     @Override
     public void parse(Input input) {
-        var m = new HashMap<String, String>();
-        for (String line : input.lines()) {
-            if (line.isEmpty()) {
-                passports.add(m);
-                m = new HashMap<>();
+        boolean valid = true;
+        var pp = new String[8];
+        var bb = new ByteBiter(input.bytes(this));
+        while (bb.hasRemaining()) {
+            int key = bb.getBinaryInt();
+            String value = bb.extractToWhitespace();
+            int index = index(key);
+            if (index >= 0) {
+                pp[index] = value;
             } else {
-                for (var r : SUtils.findKeyValuePairs(line, ' ', ':')) {
-                    m.put(line.substring(r.start(), r.sep()), line.substring(r.sep() + 1, r.end()));
+                valid = false;
+            }
+            if (bb.hasRemaining() && bb.get() == '\n') {
+                if (bb.hasRemaining() && bb.peek() == '\n') {
+                    bb.get();
+                    if (valid) {
+                        addIfValid(pp);
+                    }
+                    valid = true;
+                    pp = new String[8];
                 }
             }
         }
-        if (!m.isEmpty()) {
-            passports.add(m);
+    }
+
+    private void addIfValid(String[] pp) {
+        for (int i = 0; i < 7; i++) {
+            if (pp[i] == null) {
+                return;
+            }
         }
+        passports.add(pp);
+    }
+
+    int index(int hash) {
+        return switch (hash) {
+            case 1652126266 -> 0; // "byr"
+            case 1769566778 -> 1; // "iyr"
+            case 1702457914 -> 2; // "eyr"
+            case 1751610426 -> 3; // "hgt"
+            case 1751346234 -> 4; // "hcl"
+            case 1701014586 -> 5; // "ecl"
+            case 1885955130 -> 6; // "pid"
+            case 1667851322 -> 7; // "cid" // no extra validation
+            default -> -1;
+        };
     }
 
     @Override
     public Object part1() {
-        return passports.stream()
-                .filter(m -> m.keySet().containsAll(keys))
-                .count();
+        return passports.size();
     }
 
     @Override
     public Object part2() {
-        return passports.stream()
-                .filter(this::checkFields)
-                .count();
+        int p2 = 0;
+        for (var pp : passports) {
+            if (checkFields(pp)) {
+                p2 ++;
+            }
+        }
+        return p2;
     }
 
     Set<String> colours = Set.of("amb","blu","brn","gry","grn","hzl","oth");
     Pattern hair = Pattern.compile("\\#[0-9a-f]{6}");
     Pattern id = Pattern.compile("[0-9]{9}");
 
-    // Not aiming for clean code, but things I should have thought of for speed
-    private boolean checkFields(Map<String, String> m) {
-        SetView<String> inter = Sets.intersection(keys, m.keySet());
-        if (inter.size() < 7) {
-            return false;
-        }
-
-        for (Entry<String, String> e : m.entrySet()) {
-            String v = e.getValue();
-            Integer i = Ints.tryParse(v);
-            boolean ok = switch (e.getKey()) {
-                case "byr" -> i != null && i >= 1920 && i <= 2002;
-                case "iyr" -> i != null && i >= 2010 && i <= 2020;
-                case "eyr" -> i != null && i >= 2020 && i <= 2030;
-                case "hgt" -> checkHeight(v);
-                case "hcl" -> hair.matcher(v).matches();
-                case "ecl" -> colours.contains(v);
-                case "pid" -> id.matcher(v).matches();
-                default -> true;
-            };
-            if (!ok) return false;
-        }
-        return true;
+    private boolean checkFields(String[] pp) {
+        Integer b = Ints.tryParse(pp[0]);
+        Integer i = Ints.tryParse(pp[1]);
+        Integer e = Ints.tryParse(pp[2]);
+        return b != null && b >= 1920 && b <= 2002
+                && i != null && i >= 2010 && i <= 2020
+                && e != null && e >= 2020 && e <= 2030
+                && checkHeight(pp[3]) // 21 us
+                && hair.matcher(pp[4]).matches() // 47 us
+                && colours.contains(pp[5]) // 20 us
+                && id.matcher(pp[6]).matches() // 48 us
+                ;
     }
 
     private boolean checkHeight(String hh) {

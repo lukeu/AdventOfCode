@@ -1,5 +1,7 @@
 package util;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Similar to a ByteBuffer, but being less abstract and simpler yields a small perf benefit (~10%)
  * and allows things like moving the position arbitrarily.
@@ -24,6 +26,12 @@ public class ByteBiter {
         return bytes[pos++];
     }
 
+
+    public byte peek() {
+        return bytes[pos];
+    }
+
+    /** Reads ASCII text, leaving the position at the next non-digit. */
     public int positiveInt() {
         int acc = 0;
         do {
@@ -35,6 +43,28 @@ public class ByteBiter {
             }
         } while (++pos < bytes.length);
         return acc;
+    }
+
+    /**
+     * Reads ASCII text, leaving the position at the next ' ' or '\n' (NB: limited ws support!)
+     */
+    public String extractToWhitespace() {
+        int start = pos;
+        do {
+            int b = bytes[pos];
+            if (b == ' ' || b == '\n') {
+                break;
+            }
+        } while (++pos < bytes.length);
+        return new String(bytes, start, pos - start, StandardCharsets.US_ASCII);
+    }
+
+    /** interprets 4 bytes as a BINARY integer from the file, big endian */
+    public int getBinaryInt() {
+        return (get() << 24)
+                + (get() << 16)
+                + (get() << 8)
+                + get();
     }
 
     public void skip() {
