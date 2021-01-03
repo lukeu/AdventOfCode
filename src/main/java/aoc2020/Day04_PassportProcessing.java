@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.google.common.primitives.Ints;
 import framework.AocMeta;
 import framework.Base;
 import framework.Input;
@@ -101,7 +100,7 @@ public class Day04_PassportProcessing extends Base {
         return b >= 1920 && b <= 2002
                 && i >= 2010 && i <= 2020
                 && e >= 2020 && e <= 2030
-                && checkHeight((String) pp[3]) // 21 us
+                && checkHeight((String) pp[3]) // 14 us
                 && hair.matcher((String) pp[4]).matches() // 47 us
                 && colours.contains(pp[5]) // 20 us
                 && id.matcher((String) pp[6]).matches() // 48 us
@@ -109,14 +108,17 @@ public class Day04_PassportProcessing extends Base {
     }
 
     private boolean checkHeight(String hh) {
-        if (hh.indexOf("cm") == 3) {
-            int hgt = Ints.tryParse(hh.substring(0,3));
-            return hgt >= 150 && hgt <= 193;
-        } else if (hh.indexOf("in") == 2) {
-            int hgt = Ints.tryParse(hh.substring(0,2));
-            return hgt >= 59 && hgt <= 76;
-        } else {
+        if (hh.length() < 4) {
             return false;
         }
+        if (hh.charAt(2) == 'i') {
+            int hgt = Integer.parseInt(hh, 0, 2, 10);
+            return hgt >= 59 && hgt <= 76 && hh .charAt(3) == 'n';
+        }
+        if (hh.charAt(3) == 'c') {
+            int hgt = Integer.parseInt(hh, 0, 3, 10);
+            return hgt >= 150 && hgt <= 193 && hh.charAt(4) == 'm';
+        }
+        return false;
     }
 }
