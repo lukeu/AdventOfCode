@@ -1,10 +1,7 @@
 package aoc2020;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
-import com.google.common.primitives.Ints;
 import framework.AocMeta;
 import framework.Base;
 import framework.Input;
@@ -19,112 +16,106 @@ public class Day04_PassportProcessing extends Base {
     @Override public Object expect1() { return 254; }
     @Override public Object expect2() { return 184; }
 
-    private List<Object[]> passports = new ArrayList<>();
+    int p1 = 0;
+    int p2 = 0;
 
     @Override
     public void parse(Input input) {
-        boolean valid = true;
-        var pp = new Object[8];
+        int found = 0;
         var bb = new ByteBiter(input.bytes(this));
+        boolean valid = true;
         while (bb.hasRemaining()) {
             int key = bb.getBinaryInt();
             int index = index(key);
-            Object value = (index >= 0 && index <= 2)
-                    ? bb.positiveInt() // NB: nasty assumption about input made here
-                    : bb.extractToWhitespace();
-            if (index >= 0) {
-                pp[index] = value;
-            } else {
-                valid = false;
-            }
+            found |= index;
+            valid = valid && consumeAndCheckField(bb, index);
+            bb.consumeUntilWs();
             if (bb.hasRemaining() && bb.get() == '\n') {
                 if (bb.hasRemaining() && bb.peek() == '\n') {
                     bb.get();
-                    if (valid) {
-                        addIfValid(pp);
+                    if (found == 127) {
+                        p1++;
+                        if (valid) {
+                            p2++;
+                        }
                     }
+                    found = 0;
                     valid = true;
-                    pp = new Object[8];
                 }
             }
         }
     }
 
-    private void addIfValid(Object[] pp) {
-        for (int i = 0; i < 7; i++) {
-            if (pp[i] == null) {
-                return;
-            }
-        }
-        passports.add(pp);
-    }
-
     int index(int hash) {
         return switch (hash) {
-            case 1652126266 -> 0; // "byr"
-            case 1769566778 -> 1; // "iyr"
-            case 1702457914 -> 2; // "eyr"
-            case 1751610426 -> 3; // "hgt"
-            case 1751346234 -> 4; // "hcl"
-            case 1701014586 -> 5; // "ecl"
-            case 1885955130 -> 6; // "pid"
-            case 1667851322 -> 7; // "cid" // no extra validation
-            default -> -1;
+            case 1652126266 -> 1; // "byr"
+            case 1769566778 -> 2; // "iyr"
+            case 1702457914 -> 4; // "eyr"
+            case 1751610426 -> 8; // "hgt"
+            case 1751346234 -> 16; // "hcl"
+            case 1701014586 -> 32; // "ecl"
+            case 1885955130 -> 64; // "pid"
+            default -> 0; // "cid" // no extra validation
         };
+    }
+
+    boolean consumeAndCheckField(ByteBiter bb, int index) {
+        return switch (index) {
+            case 1 -> checkRange(bb, 1920, 2002); // "byr"
+            case 2 -> checkRange(bb, 2010, 2020); // "iyr"
+            case 4 -> checkRange(bb, 2020, 2030); // "eyr"
+            case 8 -> checkHeight(bb); // "hgt"
+            case 16 -> checkHair(bb); // "hcl"
+            case 32 -> colours.contains(bb.extractToWhitespace()); // "ecl"
+            case 64 -> checkDigits(bb, 9); // "pid"
+            default -> true; // "cid" // no extra validation
+        };
+    }
+
+    boolean checkRange(ByteBiter bb, int min, int max) {
+        int i = bb.positiveInt();
+        return i >= min && i <= max;
+    }
+
+    boolean checkDigits(ByteBiter bb, int nDigits) {
+        int mark = bb.pos;
+        return bb.positiveInt() > 0 && (bb.pos - mark) == nDigits;
     }
 
     @Override
     public Object part1() {
-        return passports.size();
+        return p1;
     }
 
     @Override
     public Object part2() {
-        int p2 = 0;
-        for (var pp : passports) {
-            if (checkFields(pp)) {
-                p2 ++;
-            }
-        }
         return p2;
     }
 
     Set<String> colours = Set.of("amb","blu","brn","gry","grn","hzl","oth");
 
-    private boolean checkFields(Object[] pp) {
-        int b = (Integer) pp[0];
-        int i = (Integer) pp[1];
-        int e = (Integer) pp[2];
-        return b >= 1920 && b <= 2002
-                && i >= 2010 && i <= 2020
-                && e >= 2020 && e <= 2030
-                && checkHeight((String) pp[3]) // 14 us
-                && checkHair((String) pp[4])
-                && colours.contains(pp[5]) // 20 us
-                && checkId((String) pp[6])
-                ;
+    boolean checkHeight(ByteBiter bb) {
+        int n = bb.positiveInt();
+        return switch (bb.peek()) {
+            case 'i' -> n >= 59 && n <= 76;
+            case 'c' -> n >= 150 && n <= 193;
+            default -> false;
+        };
     }
 
-    private boolean checkHeight(String hh) {
-        if (hh.length() < 4) {
-            return false;
-        }
-        if (hh.charAt(2) == 'i') {
-            int hgt = Integer.parseInt(hh, 0, 2, 10);
-            return hgt >= 59 && hgt <= 76 && hh .charAt(3) == 'n';
-        }
-        if (hh.charAt(3) == 'c') {
-            int hgt = Integer.parseInt(hh, 0, 3, 10);
-            return hgt >= 150 && hgt <= 193 && hh.charAt(4) == 'm';
-        }
-        return false;
+    boolean checkHair(ByteBiter bb) {
+        return bb.get() == '#' && consumeHex(bb) == 6;
     }
 
-    private boolean checkHair(String s) {
-        return s.length() == 7 && s.charAt(0) == '#' && Ints.tryParse(s.substring(1), 16) != null;
-    }
-
-    private boolean checkId(String s) {
-        return s.length() == 9 && Ints.tryParse(s) != null;
+    int consumeHex(ByteBiter bb) {
+        int mark = bb.pos;
+        while (bb.hasRemaining()) {
+            byte b = bb.peek();
+            if ((b < '0' || b > '9') && (b < 'a' || b > 'f')) {
+                break;
+            }
+            bb.skip();
+        }
+        return bb.pos - mark;
     }
 }

@@ -96,4 +96,10 @@ public class ByteBiter {
         }
         return acc;
     }
+
+    public void consumeUntilWs() {
+        while (hasRemaining() && peek() != '\n' && peek() != ' ') {
+            skip();
+        }
+    }
 }
