@@ -3,8 +3,8 @@ package aoc2020;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
+import com.google.common.primitives.Ints;
 import framework.AocMeta;
 import framework.Base;
 import framework.Input;
@@ -90,8 +90,6 @@ public class Day04_PassportProcessing extends Base {
     }
 
     Set<String> colours = Set.of("amb","blu","brn","gry","grn","hzl","oth");
-    Pattern hair = Pattern.compile("\\#[0-9a-f]{6}");
-    Pattern id = Pattern.compile("[0-9]{9}");
 
     private boolean checkFields(Object[] pp) {
         int b = (Integer) pp[0];
@@ -101,9 +99,9 @@ public class Day04_PassportProcessing extends Base {
                 && i >= 2010 && i <= 2020
                 && e >= 2020 && e <= 2030
                 && checkHeight((String) pp[3]) // 14 us
-                && hair.matcher((String) pp[4]).matches() // 47 us
+                && checkHair((String) pp[4])
                 && colours.contains(pp[5]) // 20 us
-                && id.matcher((String) pp[6]).matches() // 48 us
+                && checkId((String) pp[6])
                 ;
     }
 
@@ -120,5 +118,13 @@ public class Day04_PassportProcessing extends Base {
             return hgt >= 150 && hgt <= 193 && hh.charAt(4) == 'm';
         }
         return false;
+    }
+
+    private boolean checkHair(String s) {
+        return s.length() == 7 && s.charAt(0) == '#' && Ints.tryParse(s.substring(1), 16) != null;
+    }
+
+    private boolean checkId(String s) {
+        return s.length() == 9 && Ints.tryParse(s) != null;
     }
 }
