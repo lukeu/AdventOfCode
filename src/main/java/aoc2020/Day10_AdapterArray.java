@@ -44,10 +44,10 @@ public class Day10_AdapterArray extends Base {
     @Override
     public Long part2() {
         long[] comb = new long[highest + 1];
-        return recurse(0L, comb, 0);
+        return recurse(comb, 0);
     }
 
-    private long recurse(long acc, long[] comb, int i) {
+    private long recurse(long[] comb, int i) {
         if (i == highest) {
             return 1;
         }
@@ -55,7 +55,7 @@ public class Day10_AdapterArray extends Base {
         for (int j = i+1; j <= i+3; j++) {
             if (set.contains(j)) {
                 if (comb[j] == 0) {
-                    comb[j] = recurse(acc, comb, j);
+                    comb[j] = recurse(comb, j);
                 }
                 choices += comb[j];
             }
