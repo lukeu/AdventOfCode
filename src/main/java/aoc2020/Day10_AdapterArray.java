@@ -1,43 +1,50 @@
 package aoc2020;
 
-import java.util.Arrays;
+import java.util.BitSet;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.primitives.Ints;
 import framework.Base;
 import framework.Input;
-import util.Util;
+import util.ByteBiter;
 
 public class Day10_AdapterArray extends Base {
     public static void main(String[] args) {
         Base.run(Day10_AdapterArray::new, 1);
     }
 
-    @Override public Object expect1() { return 1917L; }
+    @Override
+    public String testInput() {
+        return "16 10 15 5 1 11 7 19 6 12 4";
+    }
+
+    @Override public Object testExpect1() { return 7*5; }
+    @Override public Object testExpect2() { return 8L; }
+    @Override public Object expect1() { return 1917; }
     @Override public Object expect2() { return 113387824750592L; }
 
-    int[] in;
     int highest;
-    ImmutableSet<Integer> set;
+    BitSet bs;
 
     @Override
     public void parse(Input input) {
-        in = input.lineInts();
-        highest = (int) Util.max(in) + 3;
-        in = Ints.concat(new int[] {0}, in, new int[] {highest});
-        Arrays.sort(in);
-        set = ImmutableSet.copyOf(Ints.asList(in));
+        byte[] bytes = input.bytes(this);
+        bs = new BitSet(bytes.length * 2 / 3); // crude approximation
+        var bb = new ByteBiter(bytes);
+        while (bb.hasRemaining()) {
+            bs.set(bb.positiveInt());
+            if (bb.hasRemaining()) {
+                bb.skip(); // \n
+            }
+        }
+        highest = bs.length() - 1 + 3;
+        bs.set(0);
+        bs.set(highest);
     }
 
     @Override
-    public Long part1() {
-        var diffs = new int[in.length - 1];
-        for (int i = 0; i < diffs.length; i++) {
-            diffs[i] = in[i+1] - in[i];
-        }
-
-        var one = Arrays.stream(diffs).filter(i -> i == 1).count();
-        var three = Arrays.stream(diffs).filter(i -> i == 3).count();
+    public Integer part1() {
+        // Adapters are always 1 or 3 "jolts" apart, so threes appear as a pair of 0-bits.
+        int three = (highest - bs.cardinality() + 1) / 2;
+        int one = highest - three*3;
         return one * three;
     }
 
@@ -53,7 +60,7 @@ public class Day10_AdapterArray extends Base {
         }
         long choices = 0;
         for (int j = i+1; j <= i+3; j++) {
-            if (set.contains(j)) {
+            if (bs.get(j)) {
                 if (comb[j] == 0) {
                     comb[j] = recurse(comb, j);
                 }
