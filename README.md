@@ -33,13 +33,13 @@ Name                                                 |  Total μs |  Parsing |  
 Day 01 Report Repair                                 |        16 |       15 |        1 |        1 *
 Day 02 Password Philosophy                           |        55 |       54 |        0 |        0 *
 Day 03 Toboggan Trajectory                           |        11 |        8 |        1 |        2 *
-Day 04 Passport Processing (input validation)        |        72 |       71 |        1 |        1 *
-Day 05 Binary Boarding                               |       171 |       46 |      124 |        1
+Day 04 Passport Processing (input validation)        |        65 |       64 |        0 |        0 *
+Day 05 Binary Boarding                               |         7 |        1 |        5 |        1 *
 Day 06 Custom Customs                                |       213 |      106 |        - |      107
 Day 07 Handy Haversacks (recursive bags)             |    14,337 |      792 |   13,535 |       11
 Day 08 Handheld Halting (trivial asm)                |       326 |      116 |        3 |      206
 Day 09 Encoding Error                                |       116 |       70 |       17 |       29
-Day 10 Adapter Array                                 |        30 |       20 |        6 |        3
+Day 10 Adapter Array                                 |         4 |        2 |        0 |        2 *
 Day 11 Seating System (cellular automa 1)            |     2,098 |       33 |        - |    2,065 *
 Day 12 Rain Risk (grid navigation)                   |        47 |       28 |        - |       20
 Day 13 Shuttle Search                                |        16 |       12 |        1 |        4
