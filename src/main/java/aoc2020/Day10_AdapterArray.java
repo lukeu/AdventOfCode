@@ -28,13 +28,7 @@ public class Day10_AdapterArray extends Base {
     public void parse(Input input) {
         byte[] bytes = input.bytes(this);
         bs = new BitSet(bytes.length * 2 / 3); // crude approximation
-        var bb = new ByteBiter(bytes);
-        while (bb.hasRemaining()) {
-            bs.set(bb.positiveInt());
-            if (bb.hasRemaining()) {
-                bb.skip(); // \n
-            }
-        }
+        new ByteBiter(bytes).readPositiveInts(bs::set);
         highest = bs.length() - 1 + 3;
         bs.set(0);
         bs.set(highest);

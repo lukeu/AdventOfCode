@@ -1,6 +1,7 @@
 package util;
 
 import java.nio.charset.StandardCharsets;
+import java.util.function.IntConsumer;
 
 /**
  * Similar to a ByteBuffer, but being less abstract and simpler yields a small perf benefit (~10%)
@@ -35,14 +36,27 @@ public class ByteBiter {
     public int positiveInt() {
         int acc = 0;
         do {
-            int i = bytes[pos];
-            if (i >= '0' && i <= '9') {
-                acc = acc * 10 + (i - '0');
+            int i = bytes[pos] - '0';
+            if (i >= 0 && i <= 9) {
+                acc = acc * 10 + i;
             } else {
                 break;
             }
         } while (++pos < bytes.length);
         return acc;
+    }
+
+    /**
+     * Reads a sequence of positive (well, non-negative) integers separated by a single non-digit
+     * byte - like '\n', ' '  or ',' - through to the end of the input
+     */
+    public void readPositiveInts(IntConsumer consumer) {
+        while (hasRemaining()) {
+            consumer.accept(positiveInt());
+            if (hasRemaining()) {
+                skip();
+            }
+        }
     }
 
     /**
