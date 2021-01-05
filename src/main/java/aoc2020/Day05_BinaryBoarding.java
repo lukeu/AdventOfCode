@@ -1,9 +1,8 @@
 package aoc2020;
 
-import java.util.List;
-
 import framework.Base;
 import framework.Input;
+import util.ByteBiter;
 
 public class Day05_BinaryBoarding extends Base {
     public static void main(String[] args) {
@@ -13,12 +12,12 @@ public class Day05_BinaryBoarding extends Base {
     @Override public Object expect1() { return 980; }
     @Override public Object expect2() { return 607; }
 
-    List<String> in;
+    ByteBiter bb;
     boolean[] found = new boolean[1024];
 
     @Override
     public void parse(Input input) {
-        in = input.lines();
+        bb = new ByteBiter(input.bytes(this));
     }
 
     // New and improved, learning for next time. (See git history for the 'under pressure' version)
@@ -26,17 +25,16 @@ public class Day05_BinaryBoarding extends Base {
     public Object part1() {
         int max = 0;
 
-        for (var a : in) {
-            a = a.replace('F', '0').replace('B', '1');
-            a = a.replace('L', '0').replace('R', '1');
-            int row = Integer.parseInt(a.substring(0, 7), 2);
-            int seat = Integer.parseInt(a.substring(7, 10), 2);
-            int id = row * 8 + seat; // or just parse 'a' itself
+        while (bb.hasRemaining()) {
+            long row = bb.readAsBinary('F', 'B', 7);
+            long seat = bb.readAsBinary('L', 'R', 3);
+            int id = (int) (row * 8 + seat); // or just parse 'a' itself
 
             found[id] = true;
             if (id > max) {
                 max = id;
             }
+            bb.skip();
         }
         return max;
     }

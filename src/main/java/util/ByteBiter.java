@@ -85,6 +85,10 @@ public class ByteBiter {
         pos++;
     }
 
+    public long readAsBinary(char c, char d, int num) {
+        return readAsBinary((byte) c, (byte) d, num);
+    }
+
     public long readAsBinary(byte zero, byte one, int num) {
         return zero > one
                 ? readAsBinary0(zero, num)
