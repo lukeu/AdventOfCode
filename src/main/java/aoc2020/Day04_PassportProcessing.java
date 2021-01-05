@@ -1,5 +1,6 @@
 package aoc2020;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import framework.AocMeta;
@@ -7,6 +8,10 @@ import framework.Base;
 import framework.Input;
 import util.ByteBiter;
 
+/**
+ * This was definitely one of the harder puzzles to optimise to a good speed. The original -
+ * using a lot of RegEx and better for speed coding - can be found in the git history.
+ */
 @AocMeta(notes = "input validation")
 public class Day04_PassportProcessing extends Base {
     public static void main(String[] args) {
@@ -46,6 +51,9 @@ public class Day04_PassportProcessing extends Base {
         }
     }
 
+    @Override public Object part1() { return p1; }
+    @Override public Object part2() { return p2; }
+
     int index(int hash) {
         return switch (hash) {
             case 1652126266 -> 1; // "byr"
@@ -66,7 +74,7 @@ public class Day04_PassportProcessing extends Base {
             case 4 -> checkRange(bb, 2020, 2030); // "eyr"
             case 8 -> checkHeight(bb); // "hgt"
             case 16 -> checkHair(bb); // "hcl"
-            case 32 -> colours.contains(bb.extractToWhitespace()); // "ecl"
+            case 32 -> checkEyeColour(bb); // "ecl"
             case 64 -> checkDigits(bb, 9); // "pid"
             default -> true; // "cid" // no extra validation
         };
@@ -77,23 +85,6 @@ public class Day04_PassportProcessing extends Base {
         return i >= min && i <= max;
     }
 
-    boolean checkDigits(ByteBiter bb, int nDigits) {
-        int mark = bb.pos;
-        return bb.positiveInt() > 0 && (bb.pos - mark) == nDigits;
-    }
-
-    @Override
-    public Object part1() {
-        return p1;
-    }
-
-    @Override
-    public Object part2() {
-        return p2;
-    }
-
-    Set<String> colours = Set.of("amb","blu","brn","gry","grn","hzl","oth");
-
     boolean checkHeight(ByteBiter bb) {
         int n = bb.positiveInt();
         return switch (bb.peek()) {
@@ -101,6 +92,27 @@ public class Day04_PassportProcessing extends Base {
             case 'c' -> n >= 150 && n <= 193;
             default -> false;
         };
+    }
+
+    boolean checkEyeColour(ByteBiter bb) {
+        return colours.contains(encode3(bb));
+    }
+
+    private static final Set<Integer> colours = Set.of(
+            encode3("amb"),
+            encode3("blu"),
+            encode3("brn"),
+            encode3("gry"),
+            encode3("grn"),
+            encode3("hzl"),
+            encode3("oth"));
+
+    private static int encode3(String string) {
+        return encode3(new ByteBiter(string.getBytes(StandardCharsets.US_ASCII)));
+    }
+
+    private static int encode3(ByteBiter bb) {
+        return (bb.get() << 16) + (bb.get() << 8) + bb.get();
     }
 
     boolean checkHair(ByteBiter bb) {
@@ -117,5 +129,10 @@ public class Day04_PassportProcessing extends Base {
             bb.skip();
         }
         return bb.pos - mark;
+    }
+
+    boolean checkDigits(ByteBiter bb, int nDigits) {
+        int mark = bb.pos;
+        return bb.positiveInt() > 0 && (bb.pos - mark) == nDigits;
     }
 }
