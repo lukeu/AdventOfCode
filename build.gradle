@@ -4,20 +4,22 @@ plugins {
     id 'application'
 }
 
-sourceCompatibility = 15
-targetCompatibility = 15
+sourceCompatibility = 16
+targetCompatibility = 16
 
+/* No longer needed with JDK 16...
 tasks.withType(JavaCompile).each {
     it.options.compilerArgs.add('--enable-preview')
 }
+*/
 
 applicationName = 'AoC'
 mainClassName = 'framework.AoC'
 version = '0.2020'
 
 applicationDefaultJvmArgs = [
-    "-Xmx6G", "-Xms6G", "-XX:+UseParallelGC",
-    "--enable-preview"
+    "-Xmx6G", "-Xms6G", "-XX:+UseParallelGC"
+    //, "--enable-preview"
 ]
 
 repositories {
