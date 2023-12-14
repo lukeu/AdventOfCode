@@ -2,6 +2,7 @@ package framework;
 
 import java.util.function.Supplier;
 
+import util.SUtils;
 import util.Util;
 
 public class Base {
@@ -80,7 +81,7 @@ public class Base {
     }
 
     public int year() {
-        return 2020; // TODO
+        return SUtils.extractInts(getClass().getName())[0];
     }
 
     public int day() {

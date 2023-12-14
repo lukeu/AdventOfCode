@@ -25,6 +25,8 @@ public class AoC {
     private static final int REPETITIONS = 5;
     private static final long MIN_WARMUP_TIME_MS = 300;
 
+    private static final Pattern CLASS_PATTERN = Pattern.compile("aoc(202.?)\\.Day(\\d+).+");
+
     private static final Function<List<Long>, String> PRINT_LAST = longs -> {
             long v = longs.get(longs.size() - 1);
             return v == 0 ? "-" : String.format("%,8.0f", v / 1000f);
@@ -67,17 +69,15 @@ public class AoC {
         }
     }
 
-    private void preload() {
-        int year = 2020; // TODO: generalise!
-        String pkg = "aoc" + year;
-        Pattern pattern = Pattern.compile(pkg + "\\.Day(\\d+).+");
-
+    private static void preload() {
         long t0 = System.nanoTime();
         int count = 0;
-        for (var info : getClassesInPackage(pkg)) {
-            Matcher m = pattern.matcher(info.getName());
+        for (var info : getClasses()) {
+            Matcher m = CLASS_PATTERN.matcher(info.getName());
             if (m.matches()) {
-                if (Input.preload(year, Integer.parseInt(m.group(1)))) {
+                int year = Integer.parseInt(m.group(1));
+                int day = Integer.parseInt(m.group(2));
+                if (Input.preload(year, day)) {
                     count ++;
                 }
             }
@@ -139,7 +139,7 @@ public class AoC {
                 + getNotes(c);
     }
 
-    private String getNotes(Class<?> c) {
+    private static String getNotes(Class<?> c) {
         AocMeta meta = c.getAnnotation(AocMeta.class);
         return (meta == null || meta.notes() == null) ? "" : " (" + meta.notes() + ')';
     }
@@ -160,7 +160,7 @@ public class AoC {
                 rows);
     }
 
-    private Base invokeDefaultConstructor(Class<? extends Base> c) {
+    private static Base invokeDefaultConstructor(Class<? extends Base> c) {
         try {
             return c.getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
@@ -170,14 +170,11 @@ public class AoC {
         }
     }
 
-    private List<Class<? extends Base>> findClasses() {
-        String pkg = "aoc2020"; // TODO: generalise!
-        Pattern pattern = Pattern.compile(pkg + "\\.Day(\\d+).+");
-
+    private static List<Class<? extends Base>> findClasses() {
         List<Class<? extends Base>> result = new ArrayList<>();
-        for (var info : getClassesInPackage(pkg)) {
+        for (var info : getClasses()) {
             String name = info.getName();
-            if (pattern.matcher(name).matches()) {
+            if (CLASS_PATTERN.matcher(name).matches()) {
                 try {
                     Class<?> clazz = AoC.class.getClassLoader().loadClass(name);
                     if (clazz.getSuperclass() == Base.class) {
@@ -195,13 +192,13 @@ public class AoC {
         return result;
     }
 
-    private ImmutableSet<ClassInfo> getClassesInPackage(String pkg) throws AssertionError {
+    private static ImmutableSet<ClassInfo> getClasses() throws AssertionError {
         ClassPath cp;
         try {
             cp = ClassPath.from(AoC.class.getClassLoader());
         } catch (IOException ex) {
             throw new AssertionError(ex);
         }
-        return cp.getTopLevelClasses(pkg);
+        return cp.getTopLevelClasses();
     }
 }

@@ -3,7 +3,7 @@ package util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 import com.google.common.base.Splitter;
 import com.google.common.primitives.Ints;
@@ -53,10 +53,13 @@ public class SUtils {
         return result;
     }
 
-    public static List<int[]> readCommaInts(String in) {
-        return lines(in).stream()
-                .map(s ->Splitter.on(",").splitToList(s).stream().mapToInt(Ints::tryParse).toArray())
-                .collect(Collectors.toList());
+    public static int[] extractInts(String line) {
+        String regex = "[^0-9]+";
+        return Arrays.stream(line.split(regex))
+                .map(Ints::tryParse)
+                .filter(Objects::nonNull)
+                .mapToInt(i -> i)
+                .toArray();
     }
 
     public static int[] splitInts(String text, String regex, int nonIntValue) {
