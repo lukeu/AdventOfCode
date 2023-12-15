@@ -3,7 +3,6 @@ package framework;
 import java.util.function.Supplier;
 
 import util.SUtils;
-import util.Util;
 
 public class Base {
 
@@ -17,11 +16,11 @@ public class Base {
         if (repetitions == 0) {
             return;
         }
-        Util.profile(() -> ctor.get().go(), 1);
+        profile(() -> ctor.get().go(), 1);
 
         if (Math.abs(repetitions) > 1) {
             System.out.println("Profiling... ");
-            Util.profile(() -> ctor.get().profile(), Math.abs(repetitions) - 1);
+            profile(() -> ctor.get().profile(), Math.abs(repetitions) - 1);
         }
     }
 
@@ -78,6 +77,15 @@ public class Base {
             }
         }
         return got;
+    }
+
+    static void profile(Runnable run, int iterations) {
+        for (int i = 0; i < iterations; i++) {
+            long t0 = System.nanoTime();
+            run.run();
+            long t1 = System.nanoTime();
+            System.out.format("Time to run: %.2f ms\n", (t1 - t0) / 1000000f);
+        }
     }
 
     public int year() {

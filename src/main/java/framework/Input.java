@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import com.google.common.base.Splitter;
 import com.google.common.io.CharStreams;
@@ -33,16 +32,17 @@ public class Input {
     private final Supplier<BufferedReader> supplier;
     private final boolean isText;
 
-    Input(int year, int day) {
+    public Input(int year, int day) {
         this.supplier = () -> newReader(newStream(year, day));
         isText = false;
     }
 
-    Input(String text) {
+    public Input(String text) {
         this.supplier = () -> new BufferedReader(new StringReader(text));
         isText = true;
     }
 
+    /** All input as text, trimmed. */
     public String text() {
         try (BufferedReader reader = supplier.get()) {
             return CharStreams.toString(reader).trim();
@@ -51,26 +51,22 @@ public class Input {
         }
     }
 
+    /** Each lines in input (including blanks) */
     public List<String> lines() {
-        return withReader(r -> r.lines().collect(Collectors.toList()));
+        return withReader(r -> r.lines().toList());
     }
 
-    public int[] lineInts() {
-        return withReader(r -> r.lines()
-                .filter(s -> !s.isEmpty())
-                .mapToInt(Integer::parseInt)
-                .toArray());
-    }
-
+    /** One number per line. (blanks ignored) */
     public long[] lineLongs() {
         return withReader(r -> r.lines()
-                .filter(s -> !s.isEmpty())
+                .filter(s -> !s.isBlank())
                 .mapToLong(Long::parseLong)
                 .toArray());
     }
 
     private static final Pattern INT_SEP = Pattern.compile("[^0-9\\-]+");
 
+    /** Extract ints from all line(s) with any separators. Includes negatives. */
     public int[] ints() {
         return withReader(r -> r.lines()
                 .flatMap(s -> Splitter.on(INT_SEP).omitEmptyStrings().splitToList(s).stream())
@@ -79,8 +75,13 @@ public class Input {
                 .toArray());
     }
 
-    /** A bit verbose, but avoids splitting or processing the input multiple times. */
+    /**
+     * For input with multiple sections, separated by blank lines.
+     * @return Each multi-line block, '\n' separated.
+     */
     public List<String> blocks() {
+
+        // A bit verbose, but avoids splitting or processing the input multiple times.
         return withReader(r -> {
             var result = new ArrayList<String>();
             StringBuilder sb = new StringBuilder();
