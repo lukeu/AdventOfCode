@@ -26,24 +26,24 @@ public class Base {
 
     private final int day = Integer.parseInt(getClass().getSimpleName().substring(3,5));
 
-    /** Used by the AoC bulk-runner. */
-    private boolean m_quiet = false;
-
-    void setQuiet() {
-        m_quiet = true;
-    }
+    private boolean quiet = false;
+    private boolean profiling = false;
+    private boolean testing = false;
 
     public void test() {
-        String testInput = testInput();
-        if (testInput.isEmpty()) {
+        if (testInput().isBlank()) {
             return;
         }
-        parse(new Input(testInput));
-        printAndCheck("Test 1: ", testExpect1(), part1());
-        printAndCheck("Test 2: ", testExpect2(), part2());
+        testing = true;
+        try {
+            parse(input());
+            printAndCheck("Test 1: ", testExpect1(), part1());
+            printAndCheck("Test 2: ", testExpect2(), part2());
+        } finally {
+            testing = false;
+        }
     }
 
-    private boolean profiling = false;
 
     void profile() {
         profiling = true;
@@ -55,6 +55,11 @@ public class Base {
         profiling = true;
     }
 
+    /** Used by the AoC bulk-runner. */
+    void setQuiet() {
+        quiet = true;
+    }
+
     public void go() {
         parse(input());
         printAndCheck("PART 1: ", expect1(), part1());
@@ -62,21 +67,23 @@ public class Base {
     }
 
     Object printAndCheck(String heading, Object expected, Object got) {
-        if (!m_quiet) {
-            if (!profiling) {
-                System.out.println(heading + got + (expected == null ? " (not checked)" : ""));
-            }
-            // Still check during daily profiling - this could catch stale state, or failing to re-parse
-            if (expected != null && !expected.equals(got)) {
-                if (profiling) {
-                    System.out.format(
-                            "Day %s %sgot %s -- EXPECTED %s\n", day(), heading, got, expected);
-                } else {
-                    System.out.println(" - EXPECTED " + expected);
-                }
+        if (!quiet) {
+            boolean ok = expected == null || compare(expected, got);
+            String warning = (expected == null) ? " (not checked)"
+                    : ok ? "" : (" - EXPECTED " + expected);
+
+            // Still check during daily profiling - could catch stale state, or failing to re-parse
+            if (!profiling || !ok) {
+                System.out.format("%s Day %s %sgot %s%s\n", year(), day(), heading, got, warning);
             }
         }
         return got;
+    }
+
+
+    private  boolean compare(Object expected, Object got) {
+        return got instanceof Number n && ((Number) expected).doubleValue() == n.doubleValue()
+                || expected.equals(got);
     }
 
     static void profile(Runnable run, int iterations) {
@@ -116,7 +123,10 @@ public class Base {
     }
 
     public Input input() {
-        if (!profiling && !m_quiet) {
+        if (testing) {
+            return new Input(testInput());
+        }
+        if (!profiling && !quiet) {
             System.out.println("Reading: " + Input.resourceName(year(), day()));
         }
         return new Input(year(), day());
