@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import com.google.common.base.Splitter;
+import com.google.common.primitives.Chars;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
@@ -51,6 +53,21 @@ public class SUtils {
             start = end + 1;
         }
         return result;
+    }
+
+    public static int[] extractDigits(String line) {
+        return line.chars()
+                .filter(i -> i >= '0' && i <= '9')
+                .map(c -> c - '0')
+                .toArray();
+    }
+
+    public static char[] extractCharsMatching(String line, String regex) {
+        List<Character> result = Pattern.compile(regex).matcher(line)
+                .results()
+                .map(r -> r.group().charAt(0))
+                .toList();
+        return Chars.toArray(result);
     }
 
     public static int[] extractInts(String line) {
