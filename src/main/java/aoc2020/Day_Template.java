@@ -1,7 +1,6 @@
 package aoc2020;
 
 import framework.Base;
-import util.FUtils;
 import util.SUtils;
 
 public class Day_Template extends Base {
@@ -11,7 +10,7 @@ public class Day_Template extends Base {
 
     @Override
     public String testInput() {
-        return FUtils.readIfExists("" + year() + "/Test_" + day() + ".txt");
+        return "";
     }
     @Override public Object testExpect1() { return 0L; }
     @Override public Object testExpect2() { return 0L; }

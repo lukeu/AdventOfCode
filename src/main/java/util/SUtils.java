@@ -54,7 +54,7 @@ public class SUtils {
     }
 
     public static int[] extractInts(String line) {
-        String regex = "[^0-9]+";
+        String regex = "[^0-9\\-]+";
         return Arrays.stream(line.split(regex))
                 .map(Ints::tryParse)
                 .filter(Objects::nonNull)

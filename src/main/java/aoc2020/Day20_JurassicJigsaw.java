@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import framework.AocMeta;
 import framework.Base;
-import util.FUtils;
 import util.SUtils;
 
 @AocMeta(notes = "monochrome image processing")
@@ -28,7 +27,7 @@ public class Day20_JurassicJigsaw extends Base {
 
     @Override
     public String testInput() {
-        return FUtils.readIfExists("" + year() + "/test_" + day() + ".txt");
+        return "";
     }
     @Override public Object testExpect1() { return 20899048083289L; }
     @Override public Object testExpect2() { return 273L; }

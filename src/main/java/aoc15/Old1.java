@@ -1,6 +1,6 @@
 package aoc15;
 
-import util.FUtils;
+import framework.Input;
 
 public class Old1 {
     public static void main(String[] args) {
@@ -8,7 +8,7 @@ public class Old1 {
     }
 
     void go() {
-        String str = FUtils.readLine(2015, 1);
+        String str = new Input(2015, 1).text();
         System.out.println(str.chars().mapToLong(c -> (c == '(' ? 1 : (c == ')' ? -1 : 0))).sum());
 
         int off = 0;

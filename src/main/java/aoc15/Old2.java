@@ -2,7 +2,7 @@ package aoc15;
 
 import java.util.List;
 
-import util.FUtils;
+import framework.Input;
 
 public class Old2 {
     public static void main(String[] args) {
@@ -11,7 +11,7 @@ public class Old2 {
 
     // Version written with my daughter when she asked about programming
     void go() {
-        List<String> lines = FUtils.readLines(2015, 2);
+        List<String> lines = new Input(2015, 2).lines();
         int total = 0;
         for (String dimension : lines) {
             System.out.println("Read: " + dimension);

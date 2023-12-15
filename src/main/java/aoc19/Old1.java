@@ -2,7 +2,7 @@ package aoc19;
 
 import java.util.Arrays;
 
-import util.FUtils;
+import framework.Input;
 
 public class Old1 {
     public static void main(String[] args) {
@@ -10,7 +10,7 @@ public class Old1 {
     }
 
     void go() {
-        int[] in = FUtils.readLineInts(2019, 1);
+        int[] in = new Input(2019, 1).ints();
 
         System.out.println(Arrays.stream(in).map(i -> i / 3 - 2).sum());
 
