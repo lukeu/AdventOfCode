@@ -79,6 +79,15 @@ public class SUtils {
                 .toArray();
     }
 
+    public static long[] extractLongs(String line) {
+        String regex = "[^0-9\\-]+";
+        return Arrays.stream(line.split(regex))
+                .map(Longs::tryParse)
+                .filter(Objects::nonNull)
+                .mapToLong(i -> i)
+                .toArray();
+    }
+
     public static int[] splitInts(String text, String regex, int nonIntValue) {
         return Arrays.stream(text.split(regex))
                 .map(Ints::tryParse)
