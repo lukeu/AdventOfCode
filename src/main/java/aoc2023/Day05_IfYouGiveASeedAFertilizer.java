@@ -9,10 +9,6 @@ import framework.Input;
 import util.SUtils;
 
 public class Day05_IfYouGiveASeedAFertilizer extends Base {
-    public static void main(String[] args) {
-        Base.run(Day05_IfYouGiveASeedAFertilizer::new, 1);
-    }
-
     @Override
     public String testInput() {
         return
@@ -52,30 +48,71 @@ humidity-to-location map:
 56 93 4
 """;
     }
+
+    public static void main(String[] args) {
+        testRemapRanges();
+        Base.run(Day05_IfYouGiveASeedAFertilizer::new, 1);
+    }
+
+    /** A quick sanity test. */
+    private static void testRemapRanges() {
+        var test = new Day05_IfYouGiveASeedAFertilizer();
+        var m = new Mapping("Test mapping", List.of(
+                new Conversion(20, 10, 10),
+                new Conversion(10, 20, 10)));
+
+        var seeds = new long[] { 19, 2, 28, 2 };
+        for (int i = 0; i < seeds.length; i += 2) {
+            test.ranges.add(new Range(seeds[i], seeds[i + 1] + seeds[i]));
+        }
+        test.remapRanges(m);
+        System.out.println(test.ranges);
+        test.ranges.clear();
+    }
+
     @Override public Object testExpect1() { return 35; }
     @Override public Object testExpect2() { return 46; }
 
     record Conversion(long dest, long source, long len) {
         Conversion (String str) {
-            this(
-                    SUtils.extractLongs(str)[0],
-                    SUtils.extractLongs(str)[1], 
-                    SUtils.extractLongs(str)[2]);
+            this(SUtils.extractLongs(str));
+        }
+        private Conversion(long[] values) {
+            this(values[0], values[1], values[2]);
+            assert values.length == 3;
+        }
+
+        long adjust(long v) {
+            return v + dest - source;
+        }
+
+        boolean contains(long v) {
+            return v >= source && v < end();
+        }
+
+        long end() {
+            return source + len;
         }
     }
 
     record Mapping(String name, List<Conversion> conversions) {
         long apply(long v) {
             for (var c : conversions) {
-                if (v > c.source && v <= c.source + c.len) {
-                    return c.dest + v - c.source;
+                if (c.contains(v)) {
+                    return c.adjust(v);
                 }
             }
             return v;
         }
     }
 
-    record Range(long start, long len) {}
+    record Range(long first, long end) {
+        Range {
+            assert len() > 0; // Our algorithm should drop (not construct) empty ranges
+        }
+        long len() { return end - first; }
+        long last() { return end - 1; }
+    }
 
     long seeds[] = null;
     List<Range> ranges = new ArrayList<>();
@@ -90,7 +127,7 @@ humidity-to-location map:
                 String line = lines.get(0).substring(7);
                 seeds = SUtils.extractLongs(line);
                 for (int i = 0; i < seeds.length; i += 2) {
-                    ranges.add(new Range(seeds[i], seeds[i + 1]));
+                    ranges.add(new Range(seeds[i], seeds[i] + seeds[i + 1]));
                 }
             } else {
                 String name = lines.remove(0);
@@ -115,8 +152,44 @@ humidity-to-location map:
 
     @Override
     public Long part2() {
-        long found = 0;
-        
-        return found;
+        for (var m : mappings) {
+            remapRanges(m);
+        }
+        return ranges.stream().mapToLong(Range::first).min().getAsLong();
+    }
+
+    void remapRanges(Mapping m) {
+        var todo = new ArrayList<>(ranges);
+        var unmapped = newList();
+        var mapped = newList();
+        for (var c : m.conversions)  {
+            for (var r : todo) {
+                if (r.last() < c.source() || r.first() >= c.end()) {
+                    unmapped.add(r);
+                    continue;
+                }
+
+                boolean sliceLeft = r.first() < c.source();
+                boolean sliceRight = r.end() > c.end();
+
+                if (sliceLeft) {
+                    unmapped.add(new Range(r.first(), c.source()));
+                }
+                if (sliceRight) {
+                    unmapped.add(new Range(c.end(), r.end()));
+                }
+                long interFirst = sliceLeft ? c.source() : r.first();
+                long interEnd = sliceRight ? c.end() : r.end();
+                mapped.add(new Range(c.adjust(interFirst), c.adjust(interEnd)));
+            }
+            todo = unmapped;
+            unmapped = newList();
+        }
+        ranges = new ArrayList<>(todo);
+        ranges.addAll(mapped);
+    }
+
+    static ArrayList<Range> newList() {
+        return new ArrayList<>();
     }
 }
