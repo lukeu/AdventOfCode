@@ -3,9 +3,9 @@ package framework;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
+import framework.TableFormatter.Row;
 
 public class AoC {
 
@@ -49,7 +50,17 @@ public class AoC {
         }
     }
 
-    private final Map<String, DayStats> measurements = new TreeMap<>();
+    record Key(int year, String title) {
+        static Key from(Class<?> c) {
+            Matcher m = CLASS_PATTERN.matcher(c.getName());
+            m.matches();
+            int year = Integer.parseInt(m.group(1));
+            return new Key(year, prettyNameFor(c));
+        }
+    }
+
+    private final SortedMap<Key, DayStats> measurements = new TreeMap<>(
+            Comparator.comparing(Key::year).thenComparing(Key::title));
 
     private void run() {
         List<Class<? extends Base>> classes = findClasses();
@@ -105,7 +116,7 @@ public class AoC {
     private long measure(List<Class<? extends Base>> classes, boolean quiet) {
         long total = 0;
         for (Class<? extends Base> c : classes) {
-            DayStats ds = measurements.computeIfAbsent(prettyNameFor(c), n -> new DayStats());
+            DayStats ds = measurements.computeIfAbsent(Key.from(c), n -> new DayStats());
             long t0 = System.nanoTime();
             Base b = invokeDefaultConstructor(c);
             if (b != null) {
@@ -127,7 +138,7 @@ public class AoC {
         return total;
     }
 
-    private String prettyNameFor(Class<?> c) {
+    private static String prettyNameFor(Class<?> c) {
         String name = c.getSimpleName();
         int under = name.indexOf('_');
         if (under < 0) {
@@ -145,19 +156,23 @@ public class AoC {
     }
 
     private String formatTable(Function<List<Long>, String> formatter) {
-        List<List<String>> rows = new ArrayList<>();
-        for (Entry<String, DayStats> entry : measurements.entrySet()) {
+        int lastYear = -1;
+        List<Row> rows = new ArrayList<>();
+        for (var entry : measurements.entrySet()) {
+            if (lastYear != entry.getKey().year()) {
+                lastYear = entry.getKey().year();
+                rows.add(Row.heading(
+                        "YEAR " + lastYear, " Total μs", " Parsing", " Part 1", " Part 2"));
+            }
             DayStats ds = entry.getValue();
-            rows.add(List.of(
-                    entry.getKey(),
+            rows.add(Row.ofData(
+                    entry.getKey().title(),
                     formatter.apply(ds.total),
                     formatter.apply(ds.parse),
                     formatter.apply(ds.part1),
                     formatter.apply(ds.part2)));
         }
-        return TableFormatter.format(
-                List.of("Name   ", " Total μs", " Parsing", " Part 1", " Part 2"),
-                rows);
+        return TableFormatter.format(rows);
     }
 
     private static Base invokeDefaultConstructor(Class<? extends Base> c) {
