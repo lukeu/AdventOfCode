@@ -1,7 +1,5 @@
 package aoc2020;
 
-import java.util.Comparator;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import framework.AocMeta;
@@ -23,22 +21,14 @@ public class Day23_CrabCups extends Base {
     @Override public Object expect1() { return "47598263"; }
     @Override public Object expect2() { return 248009574232L; }
 
-    /** A singly-linked list node, carrying an extra fixed pointer to the cup 'one lower'. */
-    class Cup {
-        Cup(int i) {
-            id = i;
-        }
-        int id;
-        Cup next;
-        Cup lower;
-
-        @Override
-        public String toString() {
-            return String.format(" (%s)->%s ", id, next == null ? "." : next.id);
-        }
-    }
-
     char[] original;
+
+    /**
+     * Emulate a singly linked list.
+     * Index 0 contains the starting cup, this is not part of the cycle.
+     * Indexes 1..N represent a cup-ID, the value at this index is the next (clockwise) cup's ID;
+     */
+    int [] cups;
 
     @Override
     public void parse(Input in) {
@@ -47,83 +37,63 @@ public class Day23_CrabCups extends Base {
 
     @Override
     public String part1() {
-        Cup current = build(original.length);
-        play(current, 100);
+        build(original.length);
+        play(100);
 
-        Cup one = findOne(current);
-        return print(one.next, 8).replaceAll(" ", "");
+        return print(1, 8);
     }
 
     @Override
     public Long part2() {
-        Cup current = build(1_000_000);
-        play(current, 10_000_000);
-
-        Cup one = findOne(current);
-        return (long) one.next.id * one.next.next.id;
+        build(1_000_000);
+        play(10_000_000);
+        return (long) cups[1] * cups[cups[1]];
     }
 
-    private Cup build(int size) {
-        var cups = IntStream.range(0, size)
-            .mapToObj(i -> new Cup(i < original.length ? original[i] - '0' : i+1))
-            .collect(Collectors.toList());
-
-        Cup prev = cups.get(size - 1);
-        for (Cup c : cups) {
-            prev.next = c;
-            prev = c;
+    private void build(int size) {
+        cups = IntStream.rangeClosed(0, size).map(i -> i + 1).toArray();
+        cups[size] = original[0] - '0';
+        int cur = 0;
+        for (char ch : original) {
+            int next = ch - '0';
+            cups[cur] = next;
+            cur = next;
         }
-
-        // Link each cup to the one numerically lower
-        cups.sort(Comparator.comparing(c -> c.id));
-        Cup lower = cups.get(cups.size() - 1);
-        for (Cup c : cups) {
-            c.lower = lower;
-            lower = c;
-        }
-
-        return prev.next;
+        cups[cur] = size == original.length ? original[0] - '0' : original.length + 1;
     }
 
-    private void play(Cup current, int moves) {
+    private void play(int moves) {
+        int current = 0;
         for (int n = 0; n < moves; n++) {
-
-            Cup take = current.next;
+            current = cups[current];
 
             // Remove 3 items
-            Cup link = take.next.next.next;
-            current.next = link;
+            int h0 = cups[current];
+            int h1 = cups[h0];
+            int h2 = cups[h1];
 
             // Find the dest cup - one that isn't in the removed chain
-            Cup dest = current.lower;
-            while (dest == take || dest == take.next || dest == take.next.next) {
-                dest = dest.lower;
-            }
+            int dest = current;
+            do {
+                if (--dest == 0) {
+                    dest = cups.length - 1;
+                }
+            } while (h0 == dest || h1 == dest || h2 == dest);
 
             // Insert the chain of 3 @ dest
-            Cup after = dest.next;
-            dest.next = take;
-            take.next.next.next = after;
-
-            current = link;
+            int temp = cups[dest];
+            cups[dest] = h0;
+            cups[current] = cups[h2];
+            cups[h2] = temp;
         }
     }
 
-    private Cup findOne(Cup c) {
-        while (c.id != 1) {
-            c = c.next;
-        }
-        return c;
-    }
-
-    /** Useful for debugging, so print with spaces even though part 1 discards them. */
-    private String print(Cup c, int len) {
-        String result = "";
+    private String print(int c, int len) {
+        var sb = new StringBuilder();
         while ((len--) > 0) {
-            result += c.id;
-            result += " ";
-            c = c.next;
+            c = cups[c];
+            sb.append(c);
         }
-        return result;
+        return sb.toString();
     }
 }
