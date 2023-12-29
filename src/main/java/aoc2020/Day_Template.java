@@ -1,7 +1,7 @@
 package aoc2020;
 
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 public class Day_Template extends Base {
     public static void main(String[] args) {
@@ -16,8 +16,8 @@ public class Day_Template extends Base {
     @Override public Object testExpect2() { return 0L; }
 
     @Override
-    public void parse(String in) {
-        for (String line : SUtils.lines(in)) {
+    public void parse(Input in) {
+        for (String line : in.lines()) {
 
             
 

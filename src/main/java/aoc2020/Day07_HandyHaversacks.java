@@ -6,7 +6,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import framework.AocMeta;
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 @AocMeta(notes = "recursive bags")
 public class Day07_HandyHaversacks extends Base {
@@ -24,8 +24,8 @@ public class Day07_HandyHaversacks extends Base {
     private static final Pattern PAT = Pattern.compile("(\\d)+ (\\w+ \\w+) bag");
 
     @Override
-    public void parse(String text) {
-        for (String rule : SUtils.lines(text)) {
+    public void parse(Input input) {
+        for (String rule : input.lines()) {
             var parts = rule.split(" bags contain ");
             var m = PAT.matcher(parts[1]);
             while (m.find()) {

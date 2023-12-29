@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Splitter;
 import framework.Base;
+import framework.Input;
 import util.SUtils;
 
 public class Day16_TicketTranslation extends Base {
@@ -37,9 +38,9 @@ public class Day16_TicketTranslation extends Base {
     @Override public Object expect2() { return 1346570764607L; }
 
     @Override
-    public void parse(String text) {
+    public void parse(Input input) {
 
-        var in = SUtils.blocks(text);
+        var in = input.blocks();
         var splitter = Splitter.on('\n');
         ranges = readRanges(splitter.splitToList(in.get(0)));
         myTicket = readTickets(splitter.splitToList(in.get(1).trim())).get(0);

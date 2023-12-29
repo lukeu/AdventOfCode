@@ -10,7 +10,7 @@ import java.util.List;
 
 import framework.AocMeta;
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 @AocMeta(notes = "recursive card game")
 public class Day22_CrabCombat extends Base {
@@ -31,24 +31,27 @@ public class Day22_CrabCombat extends Base {
     List<Integer> hand2;
 
     @Override
-    public void parse(String in) {
-        var blocks = SUtils.blocks(in);
-        hand1 = Arrays.stream(blocks.get(0).split("\n")).skip(1).map(Integer::parseInt).collect(toList());
-        hand2 = Arrays.stream(blocks.get(1).split("\n")).skip(1).map(Integer::parseInt).collect(toList());
+    public void parse(Input in) {
+        var blocks = in.blocks();
+        hand1 = Arrays.stream(blocks.get(0).split("\n")).skip(1).map(Integer::parseInt).toList();
+        hand2 = Arrays.stream(blocks.get(1).split("\n")).skip(1).map(Integer::parseInt).toList();
     }
 
     @Override
     public Long part1() {
-        var p1 = new ArrayList<>(hand1);
-        var p2 = new ArrayList<>(hand2);
-        boolean win1 = play(p1, p2, false);
-        return score(win1 ? p1 : p2);
+        return playAndScore(false);
     }
 
     @Override
     public Long part2() {
-        boolean win1 = play(hand1, hand2, true);
-        return score(win1 ? hand1 : hand2);
+        return playAndScore(true);
+    }
+
+    private Long playAndScore(boolean recurse) {
+        var p1 = new ArrayList<>(hand1);
+        var p2 = new ArrayList<>(hand2);
+        boolean win1 = play(p1, p2, recurse);
+        return score(win1 ? p1 : p2);
     }
 
     boolean play(List<Integer> p1, List<Integer> p2, boolean recurse) {

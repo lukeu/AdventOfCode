@@ -89,7 +89,7 @@ public class Input {
             try {
                 while ((line = r.readLine()) != null) {
                     if (line.isEmpty()) {
-                        result.add(sb.toString());
+                        result.add(sb.toString().stripTrailing());
                         if (!sb.isEmpty()) {
                             sb = new StringBuilder();
                         }
@@ -101,7 +101,7 @@ public class Input {
                 e.printStackTrace();
             }
             if (!sb.isEmpty()) {
-                result.add(sb.toString());
+                result.add(sb.toString().stripTrailing());
             }
             return result;
         });

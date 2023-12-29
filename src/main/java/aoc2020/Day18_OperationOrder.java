@@ -4,7 +4,7 @@ import java.util.List;
 
 import framework.AocMeta;
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 @AocMeta(notes = "expression evaluation")
 public class Day18_OperationOrder extends Base {
@@ -30,8 +30,8 @@ public class Day18_OperationOrder extends Base {
     boolean isPart2 = false;
 
     @Override
-    public void parse(String text) {
-        in = SUtils.lines(text);
+    public void parse(Input input) {
+        in = input.lines();
     }
 
     @Override

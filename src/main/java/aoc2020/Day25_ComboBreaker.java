@@ -1,7 +1,7 @@
 package aoc2020;
 
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 public class Day25_ComboBreaker extends Base {
     public static void main(String[] args) {
@@ -20,8 +20,8 @@ public class Day25_ComboBreaker extends Base {
     long dpk;
 
     @Override
-    public void parse(String in) {
-        long[] longs = SUtils.lineLongs(in);
+    public void parse(Input in) {
+        long[] longs = in.lineLongs();
         cpk = longs[0];
         dpk = longs[1];
     }

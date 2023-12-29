@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import framework.AocMeta;
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 @AocMeta(notes = "monochrome image processing")
 public class Day20_JurassicJigsaw extends Base {
@@ -40,8 +40,8 @@ public class Day20_JurassicJigsaw extends Base {
     HashSet<Integer> placed = new HashSet<>();
 
     @Override
-    public void parse(String text) {
-        List<String> blocks = SUtils.blocks(text);
+    public void parse(Input input) {
+        List<String> blocks = input.blocks();
         width = (int) Math.pow(blocks.size(), 0.5);
         for (String str : blocks) {
             int num = Integer.parseInt(str.substring(5,9));

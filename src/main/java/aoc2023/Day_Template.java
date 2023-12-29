@@ -1,6 +1,7 @@
 package aoc2023;
 
 import framework.Base;
+import framework.Input;
 
 public class Day_Template extends Base {
     public static void main(String[] args) {
@@ -18,8 +19,8 @@ public class Day_Template extends Base {
 
     /** Times parses separately for optimisation runs. Can ignore when speed-coding.  */
     @Override
-    public void parse(String in) {
-        for (var line : input().lines()) {
+    public void parse(Input in) {
+        for (var line : in.lines()) {
             
         }
     }

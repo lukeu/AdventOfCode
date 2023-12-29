@@ -6,6 +6,7 @@ import java.util.stream.IntStream;
 
 import framework.AocMeta;
 import framework.Base;
+import framework.Input;
 
 @AocMeta(notes="custom linked list")
 public class Day23_CrabCups extends Base {
@@ -40,8 +41,8 @@ public class Day23_CrabCups extends Base {
     char[] original;
 
     @Override
-    public void parse(String in) {
-        original = in.toCharArray();
+    public void parse(Input in) {
+        original = in.text().toCharArray();
     }
 
     @Override

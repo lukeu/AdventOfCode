@@ -1,6 +1,5 @@
 package aoc2020;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.HashSet;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
 import com.google.common.base.Splitter;
 import framework.AocMeta;
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 @AocMeta(notes = "logic")
 public class Day21_AllergenAssessment extends Base {
@@ -38,15 +37,15 @@ public class Day21_AllergenAssessment extends Base {
     List<Food> foods;
 
     @Override
-    public void parse(String in) {
-        foods = SUtils.lines(in).stream().map(line -> {
+    public void parse(Input in) {
+        foods = in.lines().stream().map(line -> {
             int split = line.indexOf(" (");
             String allergenText = line.substring(split + ", (contains".length(), line.length() - 1);
             return new Food(
                     Splitter.on(' ').splitToList(line.substring(0, split)),
                     Splitter.on(", ").splitToList(allergenText));
 
-        }).collect(toList());
+        }).toList();
     }
 
     /** ALLERGEN => possible ingredients */

@@ -35,7 +35,7 @@ public class Day08_HandheldHalting extends Base {
     @Override
     public void parse(Input input) {
         var in = input.lines();
-        instructions = new ArrayList<Ins>(in.size());
+        instructions = new ArrayList<>(in.size());
         for (String s : in) {
             var split = s.split(" ");
             instructions.add(new Ins(split[0].intern(), Integer.parseInt(split[1])));

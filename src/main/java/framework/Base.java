@@ -104,12 +104,6 @@ public class Base {
     }
 
     public void parse(Input input) {
-        if (input != null) {
-            parse(input.text());
-        }
-    }
-
-    public void parse(String text) {
     }
 
     public String testInput() {

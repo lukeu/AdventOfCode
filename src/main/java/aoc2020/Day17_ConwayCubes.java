@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import framework.AocMeta;
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 @AocMeta(notes = "part 2 only")
 public class Day17_ConwayCubes extends Base {
@@ -26,10 +26,10 @@ public class Day17_ConwayCubes extends Base {
     @Override public Object expect2() { return 1868L; }
 
     @Override
-    public void parse(String text) {
+    public void parse(Input input) {
         Arrays.fill(min, SIZE);
         Arrays.fill(max, -1);
-        var in = SUtils.lines(text);
+        var in = input.lines();
         int y = 0;
         for (String line : in) {
             int off = SIZE / 2 - line.length() / 2 + 1;

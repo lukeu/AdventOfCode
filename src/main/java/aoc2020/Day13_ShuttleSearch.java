@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import framework.Base;
+import framework.Input;
 import util.SUtils;
 
 public class Day13_ShuttleSearch extends Base {
@@ -25,8 +26,8 @@ public class Day13_ShuttleSearch extends Base {
     int[] buses;
 
     @Override
-    public void parse(String text) {
-        var in = SUtils.lines(text);
+    public void parse(Input input) {
+        var in = input.lines();
 
         earliest = Integer.parseInt(in.get(0));
         buses = SUtils.splitInts(in.get(1), ",", -1);

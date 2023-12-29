@@ -11,7 +11,7 @@ import com.google.common.base.Splitter;
 import com.google.common.primitives.Ints;
 import framework.AocMeta;
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 @AocMeta(notes = "lexical token recognition")
 @SuppressWarnings("unchecked")
@@ -79,9 +79,8 @@ public class Day19_MonsterMessages extends Base {
     List<char[]> messages = new ArrayList<>();
 
     @Override
-    public void parse(String text) {
-        var in = SUtils.lines(text);
-        for (String s : in) {
+    public void parse(Input input) {
+        for (String s : input.lines()) {
             if (!s.isEmpty()) {
                 var split = s.split(": ");
                 if (split.length == 2) {

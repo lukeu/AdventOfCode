@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import framework.AocMeta;
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 @AocMeta(notes = "cellular automa 3")
 public class Day24_LobbyLayout extends Base {
@@ -61,9 +61,9 @@ public class Day24_LobbyLayout extends Base {
     int minx, miny, maxx, maxy;
 
     @Override
-    public void parse(String in) {
+    public void parse(Input in) {
         minx = maxx = miny = maxy = REF;
-        for (String line : SUtils.lines(in)) {
+        for (String line : in.lines()) {
             int x = REF;
             int y = REF;
             line = line.toUpperCase();

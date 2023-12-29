@@ -3,7 +3,7 @@ package aoc2020;
 import java.util.List;
 
 import framework.Base;
-import util.SUtils;
+import framework.Input;
 
 public class Day06_CustomCustoms extends Base {
 
@@ -17,8 +17,8 @@ public class Day06_CustomCustoms extends Base {
     private List<String> in;
 
     @Override
-    public void parse(String text) {
-        in = SUtils.blocks(text);
+    public void parse(Input input) {
+        in = input.blocks();
     }
 
     @Override

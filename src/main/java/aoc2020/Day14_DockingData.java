@@ -8,6 +8,7 @@ import java.util.Map;
 
 import framework.AocMeta;
 import framework.Base;
+import framework.Input;
 import util.SUtils;
 
 @AocMeta(notes = "Floating bit-masks")
@@ -37,9 +38,9 @@ public class Day14_DockingData extends Base {
     List<Integer> xx;
 
     @Override
-    public void parse(String text) {
+    public void parse(Input input) {
         andMask = orMask = 0;
-        in = SUtils.lines(text);
+        in = input.lines();
     }
 
     @Override
