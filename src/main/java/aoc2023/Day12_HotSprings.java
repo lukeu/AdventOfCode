@@ -1,13 +1,16 @@
 package aoc2023;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.primitives.Ints;
 import framework.Base;
 import framework.Input;
 import util.SUtils;
 
 public class Day12_HotSprings extends Base {
+
     public static void main(String[] args) {
         Base.run(Day12_HotSprings::new, 1);
     }
@@ -24,19 +27,24 @@ public class Day12_HotSprings extends Base {
 ?###???????? 3,2,1
 """;
     }
-    @Override public Object testExpect1() { return 24; }
-    @Override public Object testExpect2() { return 0L; }
+    @Override public Object testExpect1() { return 24; }     // 21 without extra test
+    @Override public Object testExpect2() { return 525395; } // 525152 without extra test
     @Override public Object expect1() { return 7716; }
+    @Override public Object expect2() { return 18716325559999L; }
 
-    record Line(char[] springs, int[] blocks) {}
+    private static final int MAX_BLOCKS = 32;
+    private static final int MAX_SPRINGS = 110;
+
+    record Line(String springs, int[] blocks) {}
     List<Line> lines = new ArrayList<>();
+    long[] cache = new long[MAX_BLOCKS * MAX_SPRINGS];
 
     @Override
     public void parse(Input in) {
         for (String s : in.lines()) {
             var split = SUtils.split(s, " ");
             var line = new Line(
-                    split.get(0).toCharArray(),
+                    split.get(0),
                     SUtils.extractInts(split.get(1)));
             lines.add(line);
         }
@@ -44,26 +52,44 @@ public class Day12_HotSprings extends Base {
 
     @Override
     public Long part1() {
-        long found = 0;
-        for (var line : lines) {
-            int arrangements = recurse(line, 0, 0);
-            found += arrangements;
-        }
-        return found;
+        return lines.stream().mapToLong(this::findArrangements).sum();
     }
 
-    int recurse(Line line, int b, int pos) {
-        char[] cs = line.springs();
-        if (b == line.blocks().length) {
+    @Override
+    public Long part2() {
+        return lines.stream().map(this::unfold).mapToLong(this::findArrangements).sum();
+    }
+
+    Line unfold(Line line) {
+        var b = line.blocks;
+        return new Line(
+                (line.springs + "?").repeat(4) + line.springs,
+                Ints.concat(b, b, b, b, b));
+    }
+
+    long findArrangements(Line line) {
+        Arrays.fill(cache, -1);
+        char[] cs = line.springs().toCharArray();
+        return findArrangements(cs, line.blocks, 0, 0);
+    }
+
+    long findArrangements(char[] cs, int[] blocks, int b, int pos) {
+        int cacheIndex = b*MAX_SPRINGS + pos;
+        long count = cache[cacheIndex];
+        if (cache[cacheIndex] != -1) {
+            return count;
+        }
+        if (b == blocks.length) {
             return noneMissed(cs, pos, cs.length) ? 1 : 0;
         }
-        int bLen = line.blocks()[b];
-        int count = 0;
+        int bLen = blocks[b];
+        count = 0;
         for (int i = pos; i < cs.length; ++i) {
             if (noneMissed(cs, pos, i) && canFit(cs, i, bLen)) {
-                count += recurse(line, b+1, i + bLen + 1);
+                count += findArrangements(cs, blocks, b+1, i + bLen + 1);
             }
         }
+        cache[cacheIndex] = count;
         return count;
     }
 
@@ -87,12 +113,5 @@ public class Day12_HotSprings extends Base {
             }
         }
         return pos == cs.length || cs[pos] != '#';
-    }
-
-    @Override
-    public Long part2() {
-        long found = 0;
-        
-        return found;
     }
 }
