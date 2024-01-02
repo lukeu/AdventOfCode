@@ -32,9 +32,6 @@ public class Day12_HotSprings extends Base {
     @Override public Object expect1() { return 7716; }
     @Override public Object expect2() { return 18716325559999L; }
 
-    private static final int MAX_BLOCKS = 32;
-    private static final int MAX_SPRINGS = 110;
-
     record Line(String springs, int[] blocks) {}
     List<Line> lines = new ArrayList<>();
 
@@ -51,12 +48,23 @@ public class Day12_HotSprings extends Base {
 
     @Override
     public Long part1() {
-        return lines.parallelStream().mapToLong(this::findArrangements).sum();
+        int maxSprings = 20;
+        int maxBlocks = 20;
+        var cache = ThreadLocal.withInitial(() -> new long[maxSprings * maxBlocks]);
+        return lines.parallelStream()
+                .mapToLong(l -> findArrangements(l, cache.get(), maxSprings))
+                .sum();
     }
 
     @Override
     public Long part2() {
-        return lines.parallelStream().map(this::unfold).mapToLong(this::findArrangements).sum();
+        int maxSprings = 110;
+        int maxBlocks = 32;
+        var cache = ThreadLocal.withInitial(() -> new long[maxSprings * maxBlocks]);
+        return lines.parallelStream()
+                .map(this::unfold)
+                .mapToLong(l -> findArrangements(l, cache.get(), maxSprings))
+                .sum();
     }
 
     Line unfold(Line line) {
@@ -66,15 +74,14 @@ public class Day12_HotSprings extends Base {
                 Ints.concat(b, b, b, b, b));
     }
 
-    long findArrangements(Line line) {
-        long[] cache = new long[MAX_BLOCKS * MAX_SPRINGS];
+    long findArrangements(Line line, long[] cache, int maxSprings) {
         Arrays.fill(cache, -1);
         char[] cs = line.springs().toCharArray();
-        return findArrangements(cs, line.blocks, 0, 0, cache);
+        return findArrangements(cs, line.blocks, 0, 0, cache, maxSprings);
     }
 
-    long findArrangements(char[] cs, int[] blocks, int b, int pos, long[] cache) {
-        int cacheIndex = b*MAX_SPRINGS + pos;
+    long findArrangements(char[] cs, int[] blocks, int b, int pos, long[] cache, int maxSprings) {
+        int cacheIndex = b * maxSprings + pos;
         long count = cache[cacheIndex];
         if (cache[cacheIndex] != -1) {
             return count;
@@ -86,7 +93,7 @@ public class Day12_HotSprings extends Base {
         count = 0;
         for (int i = pos; i < cs.length; ++i) {
             if (noneMissed(cs, pos, i) && canFit(cs, i, bLen)) {
-                count += findArrangements(cs, blocks, b+1, i + bLen + 1, cache);
+                count += findArrangements(cs, blocks, b+1, i + bLen + 1, cache, maxSprings);
             }
         }
         cache[cacheIndex] = count;
