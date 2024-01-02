@@ -37,7 +37,6 @@ public class Day12_HotSprings extends Base {
 
     record Line(String springs, int[] blocks) {}
     List<Line> lines = new ArrayList<>();
-    long[] cache = new long[MAX_BLOCKS * MAX_SPRINGS];
 
     @Override
     public void parse(Input in) {
@@ -52,12 +51,12 @@ public class Day12_HotSprings extends Base {
 
     @Override
     public Long part1() {
-        return lines.stream().mapToLong(this::findArrangements).sum();
+        return lines.parallelStream().mapToLong(this::findArrangements).sum();
     }
 
     @Override
     public Long part2() {
-        return lines.stream().map(this::unfold).mapToLong(this::findArrangements).sum();
+        return lines.parallelStream().map(this::unfold).mapToLong(this::findArrangements).sum();
     }
 
     Line unfold(Line line) {
@@ -68,12 +67,13 @@ public class Day12_HotSprings extends Base {
     }
 
     long findArrangements(Line line) {
+        long[] cache = new long[MAX_BLOCKS * MAX_SPRINGS];
         Arrays.fill(cache, -1);
         char[] cs = line.springs().toCharArray();
-        return findArrangements(cs, line.blocks, 0, 0);
+        return findArrangements(cs, line.blocks, 0, 0, cache);
     }
 
-    long findArrangements(char[] cs, int[] blocks, int b, int pos) {
+    long findArrangements(char[] cs, int[] blocks, int b, int pos, long[] cache) {
         int cacheIndex = b*MAX_SPRINGS + pos;
         long count = cache[cacheIndex];
         if (cache[cacheIndex] != -1) {
@@ -86,7 +86,7 @@ public class Day12_HotSprings extends Base {
         count = 0;
         for (int i = pos; i < cs.length; ++i) {
             if (noneMissed(cs, pos, i) && canFit(cs, i, bLen)) {
-                count += findArrangements(cs, blocks, b+1, i + bLen + 1);
+                count += findArrangements(cs, blocks, b+1, i + bLen + 1, cache);
             }
         }
         cache[cacheIndex] = count;
