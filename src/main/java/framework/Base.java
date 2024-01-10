@@ -26,9 +26,9 @@ public class Base {
 
     private final int day = Integer.parseInt(getClass().getSimpleName().substring(3,5));
 
-    private boolean quiet = false;
-    private boolean profiling = false;
-    private boolean testing = false;
+    protected boolean quiet = false;
+    protected boolean profiling = false;
+    protected boolean testing = false;
 
     public void test() {
         if (testInput().isBlank()) {
@@ -66,6 +66,12 @@ public class Base {
         printAndCheck("PART 2: ", expect2(), part2());
     }
 
+    public void printLines(String... ss) {
+        if (!profiling && !quiet) {
+            System.out.println(String.join("\n", ss));
+        }
+    }
+
     Object printAndCheck(String heading, Object expected, Object got) {
         if (!quiet) {
             boolean ok = expected == null || compare(expected, got);
@@ -80,8 +86,7 @@ public class Base {
         return got;
     }
 
-
-    private  boolean compare(Object expected, Object got) {
+    private static boolean compare(Object expected, Object got) {
         return got instanceof Number n && ((Number) expected).doubleValue() == n.doubleValue()
                 || expected.equals(got);
     }
@@ -120,9 +125,7 @@ public class Base {
         if (testing) {
             return new Input(testInput());
         }
-        if (!profiling && !quiet) {
-            System.out.println("Reading: " + Input.resourceName(year(), day()));
-        }
+        printLines("Reading: " + Input.resourceName(year(), day()));
         return new Input(year(), day());
     }
 
